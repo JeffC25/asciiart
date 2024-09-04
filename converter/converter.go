@@ -13,13 +13,13 @@ type Options struct {
 	scale int
 }
 
-func NewConverter(opts ...func(*Converter)) *Converter {
+func NewConverter(options ...func(*Converter)) *Converter {
 	c := &Converter{
 		scale:   8,
 		charset: " .:-=+*#%@",
 	}
 
-	for _, opt := range opts {
+	for _, opt := range options {
 		opt(c)
 	}
 
