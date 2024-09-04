@@ -1,20 +1,22 @@
 package asciiart
 
-import "image"
+import (
+	"image"
+)
 
 type Converter struct {
-	img   image.Image
-	scale int
+	charset string
+	scale   int
 }
 
 type Options struct {
 	scale int
 }
 
-func NewConverter(img image.Image, opts ...func(*Converter)) *Converter {
+func NewConverter(opts ...func(*Converter)) *Converter {
 	c := &Converter{
-		img:   img,
-		scale: 8,
+		scale:   8,
+		charset: " .:-=+*#%@",
 	}
 
 	for _, opt := range opts {
@@ -28,4 +30,10 @@ func WithScale(scale int) func(*Converter) {
 	return func(c *Converter) {
 		c.scale = scale
 	}
+}
+
+func (c *Converter) Convert(img image.Image) string {
+	// TODO
+
+	return ""
 }
