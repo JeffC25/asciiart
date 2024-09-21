@@ -1,6 +1,25 @@
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
+
+# Vim/Neovim
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+*.un~
+
+# VS Code
+.vscode/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# macOS specific
+.DS_Store
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
