@@ -23,15 +23,15 @@ type DoGOptions struct {
 	Sigma2  float32 // 2nd Gaussian blur
 	Epsilon float32 // threshold
 	Tau     float32 // Gaussian scalar coefficient
-	// Phi     float32 // hyperbolic tangent
+	Phi     float32 // hyperbolic tangent
 }
 
-func thresHoldDoG(diff, epsilon float32) uint8 {
-	if diff >= epsilon {
+func thresholdDoG(diff, epsilon, phi float32) uint8 {
+	u := diff / 255
+	if u >= epsilon {
 		return 255
 	}
-	// return uint8(1 + math.Tanh(float64(phi*(diff-epsilon))))
-	return 0
+	return uint8((1 + math.Tanh(float64(phi*(u-epsilon)))) * 255)
 }
 
 // Apply Difference of Gaussians as preprocessor for edge detection
@@ -55,7 +55,7 @@ func DoG(img image.Image, opts DoGOptions) image.Image {
 			p1 := dst1.GrayAt(j, i)
 			p2 := dst2.GrayAt(j, i)
 
-			diff := thresHoldDoG((1+opts.Tau)*float32(p1.Y)-opts.Tau*float32(p2.Y), opts.Epsilon)
+			diff := thresholdDoG((1+opts.Tau)*float32(p1.Y)-opts.Tau*float32(p2.Y), opts.Epsilon, opts.Phi)
 			doG.Set(j, i, color.Gray{Y: diff})
 		}
 

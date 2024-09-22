@@ -16,19 +16,19 @@ func TestDoG(t *testing.T) {
 	}{
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_0.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_1.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_2.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_3.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 		},
 	}
 
