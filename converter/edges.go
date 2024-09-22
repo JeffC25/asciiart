@@ -23,10 +23,10 @@ func DoG(img image.Image, sigma1, sigma2 float32) image.Image {
 	b1 := gift.New(gift.GaussianBlur(sigma1))
 	b2 := gift.New(gift.GaussianBlur(sigma2))
 
-	dst1 := image.NewGray(img.Bounds())
+	dst1 := image.NewRGBA(img.Bounds())
 	b1.Draw(dst1, img)
 
-	dst2 := image.NewGray(img.Bounds())
+	dst2 := image.NewRGBA(img.Bounds())
 	b2.Draw(dst2, img)
 
 	width := img.Bounds().Dx()
@@ -35,11 +35,14 @@ func DoG(img image.Image, sigma1, sigma2 float32) image.Image {
 	doG := image.NewGray(img.Bounds())
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			p1 := dst1.GrayAt(j, i)
-			p2 := dst2.GrayAt(j, i)
+			p1 := dst1.RGBAAt(j, i)
+			p2 := dst2.RGBAAt(j, i)
 
-			diff := max(p1.Y-p2.Y, p2.Y-p1.Y)
-			doG.SetGray(j, i, color.Gray{Y: diff})
+			diffR := uint8(math.Abs(float64(p1.R) - float64(p2.R)))
+			diffG := uint8(math.Abs(float64(p1.G) - float64(p2.G)))
+			diffB := uint8(math.Abs(float64(p1.B) - float64(p2.B)))
+
+			doG.Set(j, i, color.RGBA{R: diffR, G: diffG, B: diffB})
 		}
 
 	}
