@@ -5,38 +5,68 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 )
 
 func TestDoG(t *testing.T) {
-	filePath := filepath.Join("..", "testdata", "sample_image_1.png")
-	file, err := os.Open(filePath)
-	if err != nil {
-		t.Fatalf("Failed to open file: %v", err)
+	testData := []struct {
+		filePath string
+		sigma1   float32
+		sigma2   float32
+	}{
+		{
+			filePath: filepath.Join("..", "testdata", "sample_image_0.png"),
+			sigma1:   2,
+			sigma2:   4,
+		},
+		{
+			filePath: filepath.Join("..", "testdata", "sample_image_1.png"),
+			sigma1:   2,
+			sigma2:   4,
+		},
+		{
+			filePath: filepath.Join("..", "testdata", "sample_image_2.png"),
+			sigma1:   2,
+			sigma2:   4,
+		},
+		{
+			filePath: filepath.Join("..", "testdata", "sample_image_3.png"),
+			sigma1:   2,
+			sigma2:   4,
+		},
 	}
-	defer file.Close()
 
-	img, _, err := image.Decode(file)
-	if err != nil {
-		t.Fatalf("Failed to decode image: %v", err)
+	for i, d := range testData {
+
+		file, err := os.Open(d.filePath)
+		if err != nil {
+			t.Fatalf("Failed to open file: %v", err)
+		}
+		defer file.Close()
+
+		img, _, err := image.Decode(file)
+		if err != nil {
+			t.Fatalf("Failed to decode image: %v", err)
+		}
+
+		doG := DoG(img, d.sigma1, d.sigma2)
+
+		outputPath := filepath.Join("..", "testdata", "output", "TestDoG"+strconv.Itoa(i)+".png")
+		outFile, err := os.Create(outputPath)
+		if err != nil {
+			t.Fatalf("Failed to create TestDoG%d.png: %v \n", i, err)
+		}
+
+		defer outFile.Close()
+
+		err = png.Encode(outFile, doG)
+		if err != nil {
+			t.Fatalf("Failed to save grayscale image: %v", err)
+		}
+
+		t.Logf("Grayscale image saved as TestDoG%d.png", i)
 	}
-
-	doG := DoG(img, 0.5, 1.5)
-
-	outputPath := filepath.Join("..", "testdata", "output", "TestDoG1.png")
-	outFile, err := os.Create(outputPath)
-	if err != nil {
-		t.Fatalf("Failed to create TestDoG1.png: %v", err)
-	}
-
-	defer outFile.Close()
-
-	err = png.Encode(outFile, doG)
-	if err != nil {
-		t.Fatalf("Failed to save grayscale image: %v", err)
-	}
-
-	t.Logf("Grayscale image saved as TestDoG1.png")
 }
 
 func TestSobelX(t *testing.T) {
