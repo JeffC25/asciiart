@@ -12,28 +12,23 @@ import (
 func TestDoG(t *testing.T) {
 	testData := []struct {
 		filePath string
-		sigma1   float32
-		sigma2   float32
+		opt      DoGOptions
 	}{
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_0.png"),
-			sigma1:   2,
-			sigma2:   4,
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_1.png"),
-			sigma1:   2,
-			sigma2:   4,
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_2.png"),
-			sigma1:   2,
-			sigma2:   4,
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_3.png"),
-			sigma1:   2,
-			sigma2:   4,
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 140, Tau: 0.85},
 		},
 	}
 
@@ -50,7 +45,7 @@ func TestDoG(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		doG := DoG(img, d.sigma1, d.sigma2)
+		doG := DoG(img, d.opt)
 
 		outputPath := filepath.Join("..", "testdata", "output", "TestDoG"+strconv.Itoa(i)+".png")
 		outFile, err := os.Create(outputPath)

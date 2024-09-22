@@ -18,15 +18,31 @@ const (
 	DiagonalDown      // "\"
 )
 
-// Apply Difference of Gaussians as preprocessor for edge detection
-func DoG(img image.Image, sigma1, sigma2 float32) image.Image {
-	b1 := gift.New(gift.GaussianBlur(sigma1))
-	b2 := gift.New(gift.GaussianBlur(sigma2))
+type DoGOptions struct {
+	Sigma1  float32 // 1st Gaussian blur
+	Sigma2  float32 // 2nd Gaussian blur
+	Epsilon float32 // threshold
+	Tau     float32 // Gaussian scalar coefficient
+	// Phi     float32 // hyperbolic tangent
+}
 
-	dst1 := image.NewRGBA(img.Bounds())
+func thresHoldDoG(diff, epsilon float32) uint8 {
+	if diff >= epsilon {
+		return 255
+	}
+	// return uint8(1 + math.Tanh(float64(phi*(diff-epsilon))))
+	return 0
+}
+
+// Apply Difference of Gaussians as preprocessor for edge detection
+func DoG(img image.Image, opts DoGOptions) image.Image {
+	b1 := gift.New(gift.GaussianBlur(opts.Sigma1))
+	b2 := gift.New(gift.GaussianBlur(opts.Sigma2))
+
+	dst1 := image.NewGray(b1.Bounds(img.Bounds()))
 	b1.Draw(dst1, img)
 
-	dst2 := image.NewRGBA(img.Bounds())
+	dst2 := image.NewGray(b2.Bounds(img.Bounds()))
 	b2.Draw(dst2, img)
 
 	width := img.Bounds().Dx()
@@ -35,14 +51,12 @@ func DoG(img image.Image, sigma1, sigma2 float32) image.Image {
 	doG := image.NewGray(img.Bounds())
 	for i := 0; i < height; i++ {
 		for j := 0; j < width; j++ {
-			p1 := dst1.RGBAAt(j, i)
-			p2 := dst2.RGBAAt(j, i)
 
-			diffR := uint8(math.Abs(float64(p1.R) - float64(p2.R)))
-			diffG := uint8(math.Abs(float64(p1.G) - float64(p2.G)))
-			diffB := uint8(math.Abs(float64(p1.B) - float64(p2.B)))
+			p1 := dst1.GrayAt(j, i)
+			p2 := dst2.GrayAt(j, i)
 
-			doG.Set(j, i, color.RGBA{R: diffR, G: diffG, B: diffB})
+			diff := thresHoldDoG((1+opts.Tau)*float32(p1.Y)-opts.Tau*float32(p2.Y), opts.Epsilon)
+			doG.Set(j, i, color.Gray{Y: diff})
 		}
 
 	}
