@@ -2,20 +2,14 @@ package asciiart
 
 import (
 	"image"
-	"image/color"
+
+	"github.com/disintegration/gift"
 )
 
-func ToGrayscale(img image.Image) image.Image {
-	bounds := img.Bounds()
-	grayImg := image.NewGray(bounds)
-
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			oldColor := img.At(x, y)
-			grayColor := color.GrayModel.Convert(oldColor)
-			grayImg.Set(x, y, grayColor)
-		}
-	}
-
-	return grayImg
+// Grayscale and Downscale
+func Preprocess(img image.Image, factor int) image.Image {
+	g := gift.New(gift.Resize(img.Bounds().Dx()/factor, img.Bounds().Dy()/factor, gift.BoxResampling))
+	dst := image.NewGray(g.Bounds(img.Bounds()))
+	g.Draw(dst, img)
+	return dst
 }
