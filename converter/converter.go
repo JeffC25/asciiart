@@ -5,7 +5,7 @@ import (
 )
 
 type Converter struct {
-	charset string
+	charset []rune
 	scale   int
 }
 
@@ -16,7 +16,7 @@ type Options struct {
 func NewConverter(options ...func(*Converter)) *Converter {
 	c := &Converter{
 		scale:   8,
-		charset: " .:-=+*#%@",
+		charset: []rune(" .:-=+*#%@"),
 	}
 
 	for _, opt := range options {
