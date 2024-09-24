@@ -57,10 +57,10 @@ func TestDoG(t *testing.T) {
 
 		err = png.Encode(outFile, doG)
 		if err != nil {
-			t.Fatalf("Failed to save grayscale image: %v", err)
+			t.Fatalf("Failed to save image: %v", err)
 		}
 
-		t.Logf("Grayscale image saved as TestDoG%d.png", i)
+		t.Logf("Image saved as TestDoG%d.png", i)
 	}
 }
 
