@@ -24,11 +24,11 @@ func TestToGrayScale(t *testing.T) {
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_2.png"),
-			factor:   8,
+			factor:   32,
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_3.png"),
-			factor:   8,
+			factor:   32,
 		},
 	}
 
