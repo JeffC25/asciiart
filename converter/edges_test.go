@@ -64,8 +64,9 @@ func TestDoG(t *testing.T) {
 	}
 }
 
-func TestSobelX(t *testing.T) {
-	filePath := filepath.Join("..", "testdata", "sample_image_1.png")
+func TestSobel(t *testing.T) {
+	t.Log("Testing TestSobel")
+	filePath := filepath.Join("..", "testdata", "downscaled_gray_0.png")
 	file, err := os.Open(filePath)
 	if err != nil {
 		t.Fatalf("Failed to open file: %v", err)
@@ -77,53 +78,10 @@ func TestSobelX(t *testing.T) {
 		t.Fatalf("Failed to decode image: %v", err)
 	}
 
-	edges := SobelX(img)
+	edges := MapEdges(img.(*image.Gray), 0.1)
 
-	outputPath := filepath.Join("..", "testdata", "output", "TestSobelX.png")
-	outFile, err := os.Create(outputPath)
-	if err != nil {
-		t.Fatalf("Failed to create TestSobelX.png: %v", err)
+	for _, row := range edges {
+		t.Log(row)
 	}
-
-	defer outFile.Close()
-
-	err = png.Encode(outFile, edges)
-	if err != nil {
-		t.Fatalf("Failed to save grayscale image: %v", err)
-	}
-
-	t.Logf("Grayscale image saved as TestSobelX.png")
-
-}
-
-func TestSobelY(t *testing.T) {
-	filePath := filepath.Join("..", "testdata", "sample_image_1.png")
-	file, err := os.Open(filePath)
-	if err != nil {
-		t.Fatalf("Failed to open file: %v", err)
-	}
-	defer file.Close()
-
-	img, _, err := image.Decode(file)
-	if err != nil {
-		t.Fatalf("Failed to decode image: %v", err)
-	}
-
-	edges := SobelY(img)
-
-	outputPath := filepath.Join("..", "testdata", "output", "TestSobelY.png")
-	outFile, err := os.Create(outputPath)
-	if err != nil {
-		t.Fatalf("Failed to create TestSobelY.png: %v", err)
-	}
-
-	defer outFile.Close()
-
-	err = png.Encode(outFile, edges)
-	if err != nil {
-		t.Fatalf("Failed to save grayscale image: %v", err)
-	}
-
-	t.Logf("Grayscale image saved as TestSobelY.png")
 
 }

@@ -58,74 +58,78 @@ func DoG(img image.Image, opts DoGOptions) image.Image {
 			diff := thresholdDoG((1+opts.Tau)*float32(p1.Y)-opts.Tau*float32(p2.Y), opts.Epsilon, opts.Phi)
 			doG.Set(j, i, color.Gray{Y: diff})
 		}
-
 	}
 	return doG
 }
 
 // Map angle values to discrete edges
-func mapAngleToEdge(angle, Gx, Gy float64) Edge {
-	if Gx == 0 && Gy == 0 {
+func GetEdge(x, y, threshold float64) Edge {
+	magnitude := math.Hypot(x, y)
+	if magnitude < threshold {
 		return None
 	}
 
-	// Convert angle to degrees for easier mapping
-	degrees := angle * (180.0 / math.Pi)
+	// math.Atan2 outputs -Pi radians to Pi radians
+	angle := math.Atan2(y, x)
 
-	// Map angle to edge type
+	// Normalize angle to the range [0, Pi]
+	angle = math.Mod(angle, 2*math.Pi)
+	if angle < 0 {
+		angle += math.Pi
+	}
+
+	// Map the angle to the appropriate edge type
 	switch {
-	case degrees > -22.5 && degrees <= 22.5:
-		return Horizontal // Close to 0 degrees, horizontal edge
-	case degrees > 22.5 && degrees <= 67.5:
-		return DiagonalDown // Between 22.5 and 67.5 degrees, diagonal down
-	case degrees > 67.5 || degrees <= -67.5:
-		return Vertical // Close to 90 or -90 degrees, vertical edge
-	case degrees > -67.5 && degrees <= -22.5:
-		return DiagonalUp // Between -22.5 and -67.5 degrees, diagonal up
+	case angle >= 0 && angle < math.Pi/8 || angle >= 7*math.Pi/8:
+		return Horizontal
+	case angle >= math.Pi/8 && angle < 3*math.Pi/8:
+		return DiagonalUp
+	case angle >= math.Pi/2 && angle < 5*math.Pi/8:
+		return Vertical
 	default:
-		return None
+		return DiagonalDown
 	}
 }
 
-func Sobel(img image.Image) image.Image {
+func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
+	threshold := sobelThreshold * math.Hypot(255*4, 255*4)
 
-	g := gift.New(gift.Sobel())
-	dst := image.NewGray(g.Bounds(img.Bounds()))
-	g.Draw(dst, img)
-	return dst
-}
+	Gx := [3][3]float64{
+		{-1, 0, 1},
+		{-2, 0, 2},
+		{-1, 0, 1},
+	}
+	Gy := [3][3]float64{
+		{-1, -2, -1},
+		{0, 0, 0},
+		{1, 2, 1},
+	}
 
-func SobelX(img image.Image) image.Image {
-	// Create the horizontal gradient filter (Gx)
-	sobelGx := gift.New(
-		gift.Convolution([]float32{
-			-1, 0, 1,
-			-2, 0, 2,
-			-1, 0, 1,
-		}, false, false, false, 0.0),
-	)
+	width := img.Bounds().Dx()
+	height := img.Bounds().Dy()
 
-	// Prepare destination images
-	dstGx := image.NewGray(sobelGx.Bounds(img.Bounds()))
+	edges := make([][]Edge, height)
+	for y := 0; y < height; y++ {
+		edges[y] = make([]Edge, width)
+	}
 
-	// Apply the filter
-	sobelGx.Draw(dstGx, img)
-	return dstGx
-}
-func SobelY(img image.Image) image.Image {
-	// Create the vertical gradient filter (Gy)
-	sobelGy := gift.New(
-		gift.Convolution([]float32{
-			-1, -2, -1,
-			0, 0, 0,
-			1, 2, 1,
-		}, false, false, false, 0.0),
-	)
+	for y := 1; y < height-1; y++ {
+		for x := 1; x < width-1; x++ {
+			// High horizontal change = vertical edge
+			// High vertical change = horizontal edge
+			sumX := 0.0
+			sumY := 0.0
+			for ky := -1; ky <= 1; ky++ {
+				for kx := -1; kx <= 1; kx++ {
+					pixel := float64(img.GrayAt(x+kx, y+ky).Y)
+					sumX += pixel * Gx[ky+1][kx+1]
+					sumY += pixel * Gy[ky+1][kx+1]
+				}
+			}
 
-	// Prepare destination images
-	dstGy := image.NewGray(sobelGy.Bounds(img.Bounds()))
-
-	// Apply the filter
-	sobelGy.Draw(dstGy, img)
-	return dstGy
+			// Note position of x, y
+			edges[y][x] = GetEdge(sumY, sumX, threshold)
+		}
+	}
+	return edges
 }
