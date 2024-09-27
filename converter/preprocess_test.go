@@ -16,7 +16,7 @@ func TestToGrayScale(t *testing.T) {
 	}{
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_0.png"),
-			factor:   8,
+			factor:   16,
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_1.png"),
