@@ -26,6 +26,7 @@ type DoGOptions struct {
 	Phi     float32 // hyperbolic tangent
 }
 
+// Extended thresholding function for DoG output
 func thresholdDoG(diff, epsilon, phi float32) uint8 {
 	u := diff / 255
 	if u >= epsilon {
@@ -55,6 +56,7 @@ func DoG(img image.Image, opts DoGOptions) image.Image {
 			p1 := dst1.GrayAt(j, i)
 			p2 := dst2.GrayAt(j, i)
 
+			// Winnem¨oller's XDoG operator: (1 + τ) * G - τ * G
 			diff := thresholdDoG((1+opts.Tau)*float32(p1.Y)-opts.Tau*float32(p2.Y), opts.Epsilon, opts.Phi)
 			doG.Set(j, i, color.Gray{Y: diff})
 		}
@@ -62,8 +64,8 @@ func DoG(img image.Image, opts DoGOptions) image.Image {
 	return doG
 }
 
-// Map angle values to discrete edges
-func GetEdge(x, y, threshold float64) Edge {
+// Compute angle of X Y gradients and map to discrete edges if magnitude above threshold
+func XYToEdge(x, y, threshold float64) Edge {
 	magnitude := math.Hypot(x, y)
 	if magnitude < threshold {
 		return None
@@ -94,12 +96,12 @@ func GetEdge(x, y, threshold float64) Edge {
 func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
 	threshold := sobelThreshold * math.Hypot(255*4, 255*4)
 
-	Gx := [3][3]float64{
+	Gx := [3][3]int{
 		{-1, 0, 1},
 		{-2, 0, 2},
 		{-1, 0, 1},
 	}
-	Gy := [3][3]float64{
+	Gy := [3][3]int{
 		{-1, -2, -1},
 		{0, 0, 0},
 		{1, 2, 1},
@@ -117,18 +119,18 @@ func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
 		for x := 1; x < width-1; x++ {
 			// High horizontal change = vertical edge
 			// High vertical change = horizontal edge
-			sumX := 0.0
-			sumY := 0.0
+			sumX := 0
+			sumY := 0
 			for ky := -1; ky <= 1; ky++ {
 				for kx := -1; kx <= 1; kx++ {
-					pixel := float64(img.GrayAt(x+kx, y+ky).Y)
+					pixel := int(img.GrayAt(x+kx, y+ky).Y)
 					sumX += pixel * Gx[ky+1][kx+1]
 					sumY += pixel * Gy[ky+1][kx+1]
 				}
 			}
 
 			// Note position of x, y
-			edges[y][x] = GetEdge(sumY, sumX, threshold)
+			edges[y][x] = XYToEdge(float64(sumY), float64(sumX), threshold)
 		}
 	}
 	return edges

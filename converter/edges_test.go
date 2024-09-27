@@ -1,6 +1,7 @@
 package asciiart
 
 import (
+	"fmt"
 	"image"
 	"image/png"
 	"os"
@@ -61,6 +62,34 @@ func TestDoG(t *testing.T) {
 		}
 
 		t.Logf("Image saved as TestDoG%d.png", i)
+	}
+}
+
+func TestXYToEdge(t *testing.T) {
+	testData := []struct {
+		x, y, threadhold float64
+		want             Edge
+	}{
+		{0, 0, 1, None},
+		{2, 2, 8, None},
+		{2, 0, 1, Horizontal},
+		{-2, 0, 1, Horizontal},
+		{2, 2, 1, DiagonalUp},
+		{-2, -2, 1, DiagonalUp},
+		{0, 2, 1, Vertical},
+		{0, -2, 1, Vertical},
+		{2, -2, 1, DiagonalDown},
+		{-2, 2, 1, DiagonalDown},
+	}
+
+	for _, d := range testData {
+		testname := fmt.Sprintf("%.2f,%.2f,%.2f", d.x, d.y, d.threadhold)
+		t.Run(testname, func(t *testing.T) {
+			res := XYToEdge(d.x, d.y, d.threadhold)
+			if res != d.want {
+				t.Errorf("got %d, want %d", res, d.want)
+			}
+		})
 	}
 }
 
