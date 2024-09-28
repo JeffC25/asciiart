@@ -70,7 +70,7 @@ func TestXYToEdge(t *testing.T) {
 		x, y, threadhold float64
 		want             Edge
 	}{
-		{0, 0, 1, None},
+		{0, 0, 0, None},
 		{2, 2, 8, None},
 		{2, 0, 1, Horizontal},
 		{-2, 0, 1, Horizontal},

@@ -67,7 +67,7 @@ func DoG(img image.Image, opts DoGOptions) image.Image {
 // Compute angle of X Y gradients and map to discrete edges if magnitude above threshold
 func XYToEdge(x, y, threshold float64) Edge {
 	magnitude := math.Hypot(x, y)
-	if magnitude < threshold {
+	if magnitude < threshold || magnitude == 0 {
 		return None
 	}
 
