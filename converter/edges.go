@@ -11,7 +11,8 @@ import (
 type Edge int
 
 const (
-	None         Edge = iota
+	Default      Edge = iota
+	None              // Non-edge - differentiate from default/undetermined
 	Horizontal        // "_"
 	Vertical          // "|"
 	DiagonalUp        // "/"
