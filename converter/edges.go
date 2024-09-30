@@ -11,7 +11,8 @@ import (
 type Edge int
 
 const (
-	None         Edge = iota
+	Default      Edge = iota
+	None              // Non-edge - differentiate from default/undetermined
 	Horizontal        // "_"
 	Vertical          // "|"
 	DiagonalUp        // "/"
@@ -93,6 +94,7 @@ func XYToEdge(x, y, threshold float64) Edge {
 	}
 }
 
+// Map an image to a 2d array of Edge types
 func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
 	threshold := sobelThreshold * math.Hypot(255*4, 255*4)
 
