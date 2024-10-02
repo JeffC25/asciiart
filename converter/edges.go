@@ -28,12 +28,11 @@ type DoGOptions struct {
 }
 
 // Extended thresholding function for DoG output
-func thresholdDoG(diff, epsilon, phi float32) uint8 {
-	u := diff / 255
+func TanhThreshold(u, epsilon, phi float32) uint8 {
 	if u >= epsilon {
-		return 255
+		return 1
 	}
-	return uint8((1 + math.Tanh(float64(phi*(u-epsilon)))) * 255)
+	return uint8((1 + math.Tanh(float64(phi*(u-epsilon)))))
 }
 
 // Apply Difference of Gaussians as preprocessor for edge detection
@@ -57,9 +56,11 @@ func DoG(img image.Image, opts DoGOptions) image.Image {
 			p1 := dst1.GrayAt(j, i)
 			p2 := dst2.GrayAt(j, i)
 
-			// Winnem¨oller's XDoG operator: (1 + τ) * G - τ * G
-			diff := thresholdDoG((1+opts.Tau)*float32(p1.Y)-opts.Tau*float32(p2.Y), opts.Epsilon, opts.Phi)
-			doG.Set(j, i, color.Gray{Y: diff})
+			// Winnemoller's XDoG operator: (1 + τ) * G_1 - τ * G_2
+			g1 := float32(p1.Y) / 255
+			g2 := float32(p2.Y) / 255
+			d := TanhThreshold((1+opts.Tau)*g1-opts.Tau*g2, opts.Epsilon, opts.Phi)
+			doG.Set(j, i, color.Gray{Y: 255 * d})
 		}
 	}
 	return doG
@@ -72,10 +73,10 @@ func XYToEdge(x, y, threshold float64) Edge {
 		return None
 	}
 
-	// math.Atan2 outputs -Pi radians to Pi radians
+	// math.Atan2 outputs -π to π radians
 	angle := math.Atan2(y, x)
 
-	// Normalize angle to the range [0, Pi]
+	// Normalize angle to the range [0, π]
 	angle = math.Mod(angle, 2*math.Pi)
 	if angle < 0 {
 		angle += math.Pi
@@ -94,7 +95,7 @@ func XYToEdge(x, y, threshold float64) Edge {
 	}
 }
 
-// Map an image to a 2d array of Edge types
+// Map an image to a 2d slice of Edge types
 func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
 	threshold := sobelThreshold * math.Hypot(255*4, 255*4)
 
