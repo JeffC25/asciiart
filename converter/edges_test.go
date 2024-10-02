@@ -93,8 +93,7 @@ func TestXYToEdge(t *testing.T) {
 	}
 }
 
-func TestSobel(t *testing.T) {
-	t.Log("Testing TestSobel")
+func TestMapEdges(t *testing.T) {
 	filePath := filepath.Join("..", "testdata", "downscaled_gray_0.png")
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -113,4 +112,66 @@ func TestSobel(t *testing.T) {
 		t.Log(row)
 	}
 
+}
+
+func TestIntegration(t *testing.T) {
+	testData := []struct {
+		filePath   string
+		dOpts      DoGOptions
+		sThreshold float64
+		scale      int
+		eThreshold float64
+	}{
+		{
+			filePath:   filepath.Join("..", "testdata", "sample_image_0.png"),
+			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			sThreshold: 0.1,
+			scale:      8,
+			eThreshold: 0.1,
+		},
+		//		{
+		//			filePath:   filepath.Join("..", "testdata", "sample_image_1.png"),
+		//			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+		//			sThreshold: 0.1,
+		//			scale:      8,
+		//			eThreshold: 0.3,
+		//		},
+		//		{
+		//			filePath:   filepath.Join("..", "testdata", "sample_image_2.png"),
+		//			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+		//			sThreshold: 0.1,
+		//			scale:      64,
+		//			eThreshold: 0.3,
+		//		},
+		//		{
+		//			filePath:   filepath.Join("..", "testdata", "sample_image_3.png"),
+		//			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+		//			sThreshold: 0.1,
+		//			scale:      64,
+		//			eThreshold: 0.3,
+		//		},
+	}
+
+	for _, d := range testData {
+
+		file, err := os.Open(d.filePath)
+		if err != nil {
+			t.Fatalf("Failed to open file: %v", err)
+		}
+		defer file.Close()
+
+		img, _, err := image.Decode(file)
+		if err != nil {
+			t.Fatalf("Failed to decode image: %v", err)
+		}
+
+		doG := DoG(img, d.dOpts)
+		edges := MapEdges(doG, d.sThreshold)
+		edgesDS, _ := DownscaleEdges(edges, d.scale, d.eThreshold)
+
+		for _, row := range edgesDS {
+			t.Log(string(row))
+		}
+
+	}
 }

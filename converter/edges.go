@@ -1,6 +1,7 @@
 package asciiart
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"math"
@@ -36,7 +37,7 @@ func TanhThreshold(u, epsilon, phi float32) uint8 {
 }
 
 // Apply Difference of Gaussians as preprocessor for edge detection
-func DoG(img image.Image, opts DoGOptions) image.Image {
+func DoG(img image.Image, opts DoGOptions) *image.Gray {
 	b1 := gift.New(gift.GaussianBlur(opts.Sigma1))
 	b2 := gift.New(gift.GaussianBlur(opts.Sigma2))
 
@@ -137,4 +138,69 @@ func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
 		}
 	}
 	return edges
+}
+
+func DownscaleEdges(edges [][]Edge, scale int, threshold float64) ([][]rune, error) {
+	height := len(edges)
+	width := len(edges[0])
+
+	if height < scale || width < scale {
+		return nil, fmt.Errorf("scale (%d) is larger than dimensions (%d x %d)", scale, width, height)
+	}
+
+	newHeight := height / scale
+	newWidth := width / scale
+
+	dst := make([][]rune, newHeight)
+	for y := 0; y < newHeight; y++ {
+		dst[y] = make([]rune, newWidth)
+	}
+
+	getSubmatrixEdge := func(x int, y int) Edge {
+		edgeCounts := make(map[Edge]int)
+		total := 0
+		// Analyze the current submatrix of size scale x scale
+		for subY := 0; subY < scale; subY++ {
+			for subX := 0; subX < scale; subX++ {
+				edge := edges[y*scale+subY][x*scale+subX]
+				edgeCounts[edge]++
+				total++
+			}
+		}
+
+		if float64(edgeCounts[None])/float64(total-edgeCounts[Default]) > 1-threshold {
+			return None
+		}
+
+		maxCount := 0
+		maxEdge := None
+		for edge, count := range edgeCounts {
+			if edge != None && edge != Default && count >= maxCount {
+				maxCount = count
+				maxEdge = edge
+			}
+		}
+
+		return maxEdge
+
+	}
+
+	for y := 0; y < newHeight; y++ {
+		for x := 0; x < newWidth; x++ {
+			switch getSubmatrixEdge(x, y) {
+			case Horizontal:
+				dst[y][x] = '_'
+			case DiagonalUp:
+				dst[y][x] = '/'
+			case Vertical:
+				dst[y][x] = '|'
+			case DiagonalDown:
+				dst[y][x] = '\\'
+			default:
+				dst[y][x] = ' '
+			}
+		}
+	}
+
+	return dst, nil
 }
