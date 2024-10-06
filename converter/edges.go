@@ -1,7 +1,6 @@
 package asciiart
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"math"
@@ -23,9 +22,9 @@ const (
 type DoGOptions struct {
 	Sigma1  float32 // 1st Gaussian blur
 	Sigma2  float32 // 2nd Gaussian blur
-	Epsilon float32 // threshold
+	Epsilon float32 // Magnitude threshold
 	Tau     float32 // Gaussian scalar coefficient
-	Phi     float32 // hyperbolic tangent
+	Phi     float32 // Hyperbolic tangent param
 }
 
 // Extended thresholding function for DoG output
@@ -140,16 +139,12 @@ func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
 	return edges
 }
 
-func DownscaleEdges(edges [][]Edge, scale int, threshold float64) ([][]rune, error) {
+func DownscaleEdges(edges [][]Edge, newWidth int, threshold float64) ([][]rune, error) {
 	height := len(edges)
 	width := len(edges[0])
 
-	if height < scale || width < scale {
-		return nil, fmt.Errorf("scale (%d) is larger than dimensions (%d x %d)", scale, width, height)
-	}
-
-	newHeight := height / scale
-	newWidth := width / scale
+	scale := float64(width) / float64(newWidth)
+	newHeight := int(math.Floor(float64(height) / scale))
 
 	dst := make([][]rune, newHeight)
 	for y := 0; y < newHeight; y++ {
@@ -160,9 +155,9 @@ func DownscaleEdges(edges [][]Edge, scale int, threshold float64) ([][]rune, err
 		edgeCounts := make(map[Edge]int)
 		total := 0
 		// Analyze the current submatrix of size scale x scale
-		for subY := 0; subY < scale; subY++ {
-			for subX := 0; subX < scale; subX++ {
-				edge := edges[y*scale+subY][x*scale+subX]
+		for subY := 0; float64(subY) < scale; subY++ {
+			for subX := 0; float64(subX) < scale; subX++ {
+				edge := edges[int(math.Floor(float64(y)*scale))+subY][int(math.Floor(float64(x)*scale))+subX]
 				edgeCounts[edge]++
 				total++
 			}

@@ -119,37 +119,37 @@ func TestIntegration(t *testing.T) {
 		filePath   string
 		dOpts      DoGOptions
 		sThreshold float64
-		scale      int
+		newWidth   int
 		eThreshold float64
 	}{
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_0.png"),
 			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 			sThreshold: 0.1,
-			scale:      8,
+			newWidth:   128,
+			eThreshold: 0.2,
+		},
+		{
+			filePath:   filepath.Join("..", "testdata", "sample_image_1.png"),
+			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			sThreshold: 0.1,
+			newWidth:   128,
+			eThreshold: 0.3,
+		},
+		{
+			filePath:   filepath.Join("..", "testdata", "sample_image_2.png"),
+			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			sThreshold: 0.1,
+			newWidth:   128,
+			eThreshold: 0.05,
+		},
+		{
+			filePath:   filepath.Join("..", "testdata", "sample_image_3.png"),
+			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			sThreshold: 0.1,
+			newWidth:   128,
 			eThreshold: 0.1,
 		},
-		//		{
-		//			filePath:   filepath.Join("..", "testdata", "sample_image_1.png"),
-		//			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-		//			sThreshold: 0.1,
-		//			scale:      8,
-		//			eThreshold: 0.3,
-		//		},
-		//		{
-		//			filePath:   filepath.Join("..", "testdata", "sample_image_2.png"),
-		//			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-		//			sThreshold: 0.1,
-		//			scale:      64,
-		//			eThreshold: 0.3,
-		//		},
-		//		{
-		//			filePath:   filepath.Join("..", "testdata", "sample_image_3.png"),
-		//			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-		//			sThreshold: 0.1,
-		//			scale:      64,
-		//			eThreshold: 0.3,
-		//		},
 	}
 
 	for _, d := range testData {
@@ -167,7 +167,7 @@ func TestIntegration(t *testing.T) {
 
 		doG := DoG(img, d.dOpts)
 		edges := MapEdges(doG, d.sThreshold)
-		edgesDS, _ := DownscaleEdges(edges, d.scale, d.eThreshold)
+		edgesDS, _ := DownscaleEdges(edges, d.newWidth, d.eThreshold)
 
 		for _, row := range edgesDS {
 			t.Log(string(row))

@@ -12,23 +12,23 @@ import (
 func TestToGrayScale(t *testing.T) {
 	testData := []struct {
 		filePath string
-		factor   int
+		width    int
 	}{
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_0.png"),
-			factor:   16,
+			width:    128,
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_1.png"),
-			factor:   8,
+			width:    128,
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_2.png"),
-			factor:   32,
+			width:    128,
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_3.png"),
-			factor:   32,
+			width:    128,
 		},
 	}
 
@@ -45,7 +45,7 @@ func TestToGrayScale(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		pre := Preprocess(img, d.factor)
+		pre := Preprocess(img, d.width)
 
 		outputPath := filepath.Join("..", "testdata", "output", "TestPreproc"+strconv.Itoa(i)+".png")
 		outFile, err := os.Create(outputPath)
