@@ -67,14 +67,14 @@ func DoG(img image.Image, opts DoGOptions) *image.Gray {
 }
 
 // Compute angle of X Y gradients and map to discrete edges if magnitude above threshold
-func XYToEdge(x, y, threshold float64) Edge {
-	magnitude := math.Hypot(x, y)
-	if magnitude < threshold || magnitude == 0 {
+func XYToEdge(x, y, threshold float32) Edge {
+	magnitude := math.Hypot(float64(y), float64(x))
+	if magnitude < float64(threshold) || magnitude == 0 {
 		return None
 	}
 
 	// math.Atan2 outputs -π to π radians
-	angle := math.Atan2(y, x)
+	angle := math.Atan2(float64(y), float64(x))
 
 	// Normalize angle to the range [0, π]
 	angle = math.Mod(angle, 2*math.Pi)
@@ -96,8 +96,8 @@ func XYToEdge(x, y, threshold float64) Edge {
 }
 
 // Map an image to a 2d slice of Edge types
-func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
-	threshold := sobelThreshold * math.Hypot(255*4, 255*4)
+func MapEdges(img *image.Gray, sobelThreshold float32) [][]Edge {
+	threshold := sobelThreshold * float32(math.Hypot(255*4, 255*4))
 
 	Gx := [3][3]int{
 		{-1, 0, 1},
@@ -133,13 +133,13 @@ func MapEdges(img *image.Gray, sobelThreshold float64) [][]Edge {
 			}
 
 			// Note position of x, y
-			edges[y][x] = XYToEdge(float64(sumY), float64(sumX), threshold)
+			edges[y][x] = XYToEdge(float32(sumY), float32(sumX), threshold)
 		}
 	}
 	return edges
 }
 
-func DownscaleEdges(edges [][]Edge, newWidth int, threshold float64) ([][]rune, error) {
+func DownscaleEdges(edges [][]Edge, newWidth int, threshold float32) ([][]rune, error) {
 	height := len(edges)
 	width := len(edges[0])
 
@@ -163,7 +163,7 @@ func DownscaleEdges(edges [][]Edge, newWidth int, threshold float64) ([][]rune, 
 			}
 		}
 
-		if float64(edgeCounts[None])/float64(total-edgeCounts[Default]) > 1-threshold {
+		if float32(edgeCounts[None])/float32(total-edgeCounts[Default]) > 1-threshold {
 			return None
 		}
 

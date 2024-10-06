@@ -25,7 +25,7 @@ func TestDoG(t *testing.T) {
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_2.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			opt:      DoGOptions{Sigma1: 1, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_3.png"),
@@ -67,7 +67,7 @@ func TestDoG(t *testing.T) {
 
 func TestXYToEdge(t *testing.T) {
 	testData := []struct {
-		x, y, threadhold float64
+		x, y, threadhold float32
 		want             Edge
 	}{
 		{0, 0, 0, None},
@@ -118,37 +118,37 @@ func TestIntegration(t *testing.T) {
 	testData := []struct {
 		filePath   string
 		dOpts      DoGOptions
-		sThreshold float64
 		newWidth   int
-		eThreshold float64
+		sThreshold float32
+		eThreshold float32
 	}{
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_0.png"),
-			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			sThreshold: 0.1,
-			newWidth:   128,
-			eThreshold: 0.2,
+			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			newWidth:   100,
+			sThreshold: 0.2,
+			eThreshold: 0.05,
 		},
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_1.png"),
-			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			sThreshold: 0.1,
-			newWidth:   128,
-			eThreshold: 0.3,
+			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			newWidth:   100,
+			sThreshold: 0.2,
+			eThreshold: 0.05,
 		},
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_2.png"),
-			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			sThreshold: 0.1,
-			newWidth:   128,
+			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			newWidth:   100,
+			sThreshold: 0.2,
 			eThreshold: 0.05,
 		},
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_3.png"),
-			dOpts:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			sThreshold: 0.1,
-			newWidth:   128,
-			eThreshold: 0.1,
+			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			newWidth:   100,
+			sThreshold: 0.2,
+			eThreshold: 0.05,
 		},
 	}
 
