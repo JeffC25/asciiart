@@ -10,7 +10,7 @@ import (
 )
 
 // Grayscale and Downscale
-func Preprocess(img image.Image, width int) *image.Gray {
+func GrayDownscale(img image.Image, width int) *image.Gray {
 	scale := float64(img.Bounds().Dx()) / float64(width)
 	height := int(math.Ceil(float64(img.Bounds().Dy()) / scale))
 

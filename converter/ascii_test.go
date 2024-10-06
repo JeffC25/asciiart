@@ -45,7 +45,7 @@ func TestPreProcess(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		pre := Preprocess(img, d.width)
+		pre := GrayDownscale(img, d.width)
 
 		outputPath := filepath.Join("..", "testdata", "output", "TestPreproc"+strconv.Itoa(i)+".png")
 		outFile, err := os.Create(outputPath)
