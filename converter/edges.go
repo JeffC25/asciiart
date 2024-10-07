@@ -84,14 +84,16 @@ func XYToEdge(x, y, threshold float32) Edge {
 
 	// Map the angle to the appropriate edge type
 	switch {
-	case angle >= 0 && angle < math.Pi/8 || angle >= 7*math.Pi/8:
+	case angle >= 0 && angle < math.Pi/8 || angle >= 15*math.Pi/8 && angle <= 2*math.Pi:
 		return Horizontal
 	case angle >= math.Pi/8 && angle < 3*math.Pi/8:
 		return DiagonalUp
-	case angle >= math.Pi/2 && angle < 5*math.Pi/8:
+	case angle >= 3*math.Pi/8 && angle < 5*math.Pi/8:
 		return Vertical
-	default:
+	case angle >= 5*math.Pi/8 && angle < 7*math.Pi/8:
 		return DiagonalDown
+	default:
+		return Horizontal // Handles angles close to multiples of π
 	}
 }
 
