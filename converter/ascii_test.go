@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestPreProcess(t *testing.T) {
+func TestGrayDownscale(t *testing.T) {
 	testData := []struct {
 		filePath string
 		width    int
@@ -47,10 +47,10 @@ func TestPreProcess(t *testing.T) {
 
 		pre := GrayDownscale(img, d.width)
 
-		outputPath := filepath.Join("..", "testdata", "output", "TestPreproc"+strconv.Itoa(i)+".png")
+		outputPath := filepath.Join("..", "testdata", "output", "TestGrayDownscale"+strconv.Itoa(i)+".png")
 		outFile, err := os.Create(outputPath)
 		if err != nil {
-			t.Fatalf("Failed to create TestPreproc%d.png: %v \n", i, err)
+			t.Fatalf("Failed to create TestGrayDownscale%d.png: %v \n", i, err)
 		}
 
 		defer outFile.Close()
@@ -60,7 +60,7 @@ func TestPreProcess(t *testing.T) {
 			t.Fatalf("Failed to save image: %v", err)
 		}
 
-		t.Logf("Image saved as TestPreproc%d.png", i)
+		t.Logf("Image saved as TestGrayDownscale%d.png", i)
 	}
 }
 
