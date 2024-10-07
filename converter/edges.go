@@ -28,11 +28,11 @@ type DoGOptions struct {
 }
 
 // Extended thresholding function for DoG output
-func TanhThreshold(u, epsilon, phi float32) uint8 {
+func TanhThreshold(u, epsilon, phi float32) float32 {
 	if u >= epsilon {
 		return 1
 	}
-	return uint8((1 + math.Tanh(float64(phi*(u-epsilon)))))
+	return float32((1 + math.Tanh(float64(phi*(u-epsilon)))))
 }
 
 // Apply Difference of Gaussians as preprocessor for edge detection
@@ -60,7 +60,7 @@ func DoG(img image.Image, opts DoGOptions) *image.Gray {
 			g1 := float32(p1.Y) / 255
 			g2 := float32(p2.Y) / 255
 			d := TanhThreshold((1+opts.Tau)*g1-opts.Tau*g2, opts.Epsilon, opts.Phi)
-			doG.Set(j, i, color.Gray{Y: 255 * d})
+			doG.Set(j, i, color.Gray{Y: uint8(math.Round(255 * float64(d)))})
 		}
 	}
 	return doG
