@@ -3,6 +3,7 @@ package asciiart
 import (
 	"fmt"
 	"image"
+	_ "image/jpeg"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -17,19 +18,19 @@ func TestDoG(t *testing.T) {
 	}{
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_0.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			opt:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.85, Phi: 15},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_1.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			opt:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.85, Phi: 15},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_2.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			opt:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.85, Phi: 15},
 		},
 		{
 			filePath: filepath.Join("..", "testdata", "sample_image_3.png"),
-			opt:      DoGOptions{Sigma1: 1, Sigma2: 1.5, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			opt:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.85, Phi: 15},
 		},
 	}
 
@@ -85,7 +86,7 @@ func TestXYToEdge(t *testing.T) {
 	for _, d := range testData {
 		testname := fmt.Sprintf("%.2f,%.2f,%.2f", d.x, d.y, d.threadhold)
 		t.Run(testname, func(t *testing.T) {
-			res := XYToEdge(d.x, d.y, d.threadhold)
+			res := xyToEdge(d.x, d.y, d.threadhold)
 			if res != d.want {
 				t.Errorf("got %d, want %d", res, d.want)
 			}
@@ -114,7 +115,7 @@ func TestMapEdges(t *testing.T) {
 
 }
 
-func TestIntegration(t *testing.T) {
+func TestEdgesIntegration(t *testing.T) {
 	testData := []struct {
 		filePath   string
 		dOpts      DoGOptions
@@ -124,30 +125,30 @@ func TestIntegration(t *testing.T) {
 	}{
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_0.png"),
-			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			newWidth:   100,
-			sThreshold: 0.2,
+			dOpts:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			newWidth:   185,
+			sThreshold: 0.15,
 			eThreshold: 0.05,
 		},
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_1.png"),
-			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			newWidth:   100,
-			sThreshold: 0.2,
+			dOpts:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.8, Phi: 25},
+			newWidth:   185,
+			sThreshold: 0.15,
 			eThreshold: 0.05,
 		},
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_2.png"),
-			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			newWidth:   100,
-			sThreshold: 0.2,
+			dOpts:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.85, Phi: 25},
+			newWidth:   185,
+			sThreshold: 0.15,
 			eThreshold: 0.05,
 		},
 		{
 			filePath:   filepath.Join("..", "testdata", "sample_image_3.png"),
-			dOpts:      DoGOptions{Sigma1: 2, Sigma2: 3, Epsilon: 0.65, Tau: 0.8, Phi: 25},
-			newWidth:   100,
-			sThreshold: 0.2,
+			dOpts:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.85, Phi: 25},
+			newWidth:   185,
+			sThreshold: 0.15,
 			eThreshold: 0.05,
 		},
 	}
@@ -167,7 +168,7 @@ func TestIntegration(t *testing.T) {
 
 		doG := DoG(img, d.dOpts)
 		edges := MapEdges(doG, d.sThreshold)
-		edgesDS, _ := DownscaleEdges(edges, d.newWidth, d.eThreshold)
+		edgesDS, _ := DownscaleEdges(edges, d.newWidth, 2.3, d.eThreshold)
 
 		for _, row := range edgesDS {
 			t.Log(string(row))

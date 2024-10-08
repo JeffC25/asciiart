@@ -45,7 +45,7 @@ func TestGrayDownscale(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		pre := GrayDownscale(img, d.width)
+		pre := GrayDownscale(img, d.width, 1)
 
 		outputPath := filepath.Join("..", "testdata", "output", "TestGrayDownscale"+strconv.Itoa(i)+".png")
 		outFile, err := os.Create(outputPath)

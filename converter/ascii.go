@@ -10,9 +10,9 @@ import (
 )
 
 // Grayscale and Downscale
-func GrayDownscale(img image.Image, width int) *image.Gray {
-	scale := float64(img.Bounds().Dx()) / float64(width)
-	height := int(math.Ceil(float64(img.Bounds().Dy()) / scale))
+func GrayDownscale(img image.Image, width int, squash float32) *image.Gray {
+	scale := float64(img.Bounds().Dx()) / float64(width) * float64(squash)
+	height := int(math.Floor(float64(img.Bounds().Dy()) / scale))
 
 	g := gift.New(gift.Resize(width, height, gift.BoxResampling))
 	dst := image.NewGray(g.Bounds(img.Bounds()))

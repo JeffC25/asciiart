@@ -1,6 +1,7 @@
 package asciiart
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"math"
@@ -28,7 +29,7 @@ type DoGOptions struct {
 }
 
 // Extended thresholding function for DoG output
-func TanhThreshold(u, epsilon, phi float32) float32 {
+func tanThreshold(u, epsilon, phi float32) float32 {
 	if u >= epsilon {
 		return 1
 	}
@@ -37,6 +38,7 @@ func TanhThreshold(u, epsilon, phi float32) float32 {
 
 // Apply Difference of Gaussians as preprocessor for edge detection
 func DoG(img image.Image, opts DoGOptions) *image.Gray {
+	fmt.Println("Applying Difference of Gaussians")
 	b1 := gift.New(gift.GaussianBlur(opts.Sigma1))
 	b2 := gift.New(gift.GaussianBlur(opts.Sigma2))
 
@@ -59,7 +61,7 @@ func DoG(img image.Image, opts DoGOptions) *image.Gray {
 			// Winnemoller's XDoG operator: (1 + τ) * G_1 - τ * G_2
 			g1 := float32(p1.Y) / 255
 			g2 := float32(p2.Y) / 255
-			d := TanhThreshold((1+opts.Tau)*g1-opts.Tau*g2, opts.Epsilon, opts.Phi)
+			d := tanThreshold((1+opts.Tau)*g1-opts.Tau*g2, opts.Epsilon, opts.Phi)
 			doG.Set(j, i, color.Gray{Y: uint8(math.Round(255 * float64(d)))})
 		}
 	}
@@ -67,7 +69,7 @@ func DoG(img image.Image, opts DoGOptions) *image.Gray {
 }
 
 // Compute angle of X Y gradients and map to discrete edges if magnitude above threshold
-func XYToEdge(x, y, threshold float32) Edge {
+func xyToEdge(x, y, threshold float32) Edge {
 	magnitude := math.Hypot(float64(y), float64(x))
 	if magnitude < float64(threshold) || magnitude == 0 {
 		return None
@@ -99,6 +101,7 @@ func XYToEdge(x, y, threshold float32) Edge {
 
 // Map an image to a 2d slice of Edge types
 func MapEdges(img *image.Gray, sobelThreshold float32) [][]Edge {
+	fmt.Println("Mapping edges...")
 	threshold := sobelThreshold * float32(math.Hypot(255*4, 255*4))
 
 	Gx := [3][3]int{
@@ -135,38 +138,58 @@ func MapEdges(img *image.Gray, sobelThreshold float32) [][]Edge {
 			}
 
 			// Note position of x, y
-			edges[y][x] = XYToEdge(float32(sumY), float32(sumX), threshold)
+			edges[y][x] = xyToEdge(float32(sumY), float32(sumX), threshold)
 		}
 	}
 	return edges
 }
 
-func DownscaleEdges(edges [][]Edge, newWidth int, threshold float32) ([][]rune, error) {
+func DownscaleEdges(edges [][]Edge, newWidth int, hWeight, threshold float32) ([][]rune, error) {
+	if newWidth <= 0 {
+		return nil, fmt.Errorf("non-positive newWidth: %d", newWidth)
+	}
+
+	if hWeight <= 0 {
+		return nil, fmt.Errorf("non-positive hWeight: %2f", hWeight)
+	}
+
+	if threshold < 0 || threshold > 1 {
+		return nil, fmt.Errorf("threshold needs to be between 0 and 1: %2f", threshold)
+	}
+
+	fmt.Println("Downscaling edges...")
 	height := len(edges)
 	width := len(edges[0])
 
-	scale := float64(width) / float64(newWidth)
-	newHeight := int(math.Floor(float64(height) / scale))
+	xScale := float64(width) / float64(newWidth)
+	yScale := xScale * float64(hWeight)
+	newHeight := int(math.Floor(float64(height) / yScale))
 
 	dst := make([][]rune, newHeight)
 	for y := 0; y < newHeight; y++ {
 		dst[y] = make([]rune, newWidth)
 	}
 
-	getSubmatrixEdge := func(x int, y int) Edge {
+	getSubmatrixEdge := func(x int, y int) (Edge, error) {
 		edgeCounts := make(map[Edge]int)
 		total := 0
 		// Analyze the current submatrix of size scale x scale
-		for subY := 0; float64(subY) < scale; subY++ {
-			for subX := 0; float64(subX) < scale; subX++ {
-				edge := edges[int(math.Floor(float64(y)*scale))+subY][int(math.Floor(float64(x)*scale))+subX]
+		for subY := 0; float64(subY) < yScale; subY++ {
+			for subX := 0; float64(subX) < xScale; subX++ {
+				i := int(math.Floor(float64(y)*yScale)) + subY
+				j := int(math.Floor(float64(x)*xScale)) + subX
+
+				if i >= len(edges) {
+					return None, fmt.Errorf("Y out of range: %d from %d", i, len(edges))
+				}
+				if j >= len(edges[0]) {
+					return None, fmt.Errorf("X out of range: %d from %d", j, len(edges[0]))
+				}
+
+				edge := edges[i][j]
 				edgeCounts[edge]++
 				total++
 			}
-		}
-
-		if float32(edgeCounts[None])/float32(total-edgeCounts[Default]) > 1-threshold {
-			return None
 		}
 
 		maxCount := 0
@@ -178,13 +201,19 @@ func DownscaleEdges(edges [][]Edge, newWidth int, threshold float32) ([][]rune, 
 			}
 		}
 
-		return maxEdge
-
+		if float32(maxCount)/float32(total-edgeCounts[Default]) > threshold {
+			return maxEdge, nil
+		}
+		return None, nil
 	}
 
 	for y := 0; y < newHeight; y++ {
 		for x := 0; x < newWidth; x++ {
-			switch getSubmatrixEdge(x, y) {
+			e, err := getSubmatrixEdge(x, y)
+			if err != nil {
+				return nil, err
+			}
+			switch e {
 			case Horizontal:
 				dst[y][x] = '_'
 			case DiagonalUp:
@@ -195,6 +224,33 @@ func DownscaleEdges(edges [][]Edge, newWidth int, threshold float32) ([][]rune, 
 				dst[y][x] = '\\'
 			default:
 				dst[y][x] = ' '
+			}
+		}
+	}
+
+	return dst, nil
+}
+
+func OverlayEdges(base, edges [][]rune) ([][]rune, error) {
+	fmt.Println("Overlaying edges...")
+	width := len(base[0])
+	height := len(base)
+
+	if width != len(edges[0]) || height != len(edges) {
+		return nil, fmt.Errorf("mismatched dimensions: %d x %d and %d x %d", width, height, len(edges), len(edges[0]))
+	}
+
+	fmt.Printf("%d x %d\n", width, height)
+
+	dst := make([][]rune, height)
+	for y := 0; y < height; y++ {
+		dst[y] = make([]rune, width)
+		for x := 0; x < width; x++ {
+			fmt.Printf("y: %d, x: %d\n", y, x)
+			if edges[y][x] == ' ' {
+				dst[y][x] = base[y][x]
+			} else {
+				dst[y][x] = edges[y][x]
 			}
 		}
 	}
