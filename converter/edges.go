@@ -28,16 +28,32 @@ type DoGOptions struct {
 	Phi     float32 // Hyperbolic tangent param
 }
 
-// Extended thresholding function for DoG output
-func tanThreshold(u, epsilon, phi float32) float32 {
-	if u >= epsilon {
-		return 1
+func validateDoGOptions(opts DoGOptions) error {
+	if opts.Epsilon > 1 || opts.Epsilon < 0 {
+		return fmt.Errorf("epsilon must be between 0 and 1, inclusive")
 	}
-	return float32((1 + math.Tanh(float64(phi*(u-epsilon)))))
+
+	return nil
+}
+
+// Extended thresholding function for DoG output
+func tanThreshold(u, epsilon, phi float32) (float32, error) {
+	if epsilon > 1 || epsilon < 0 {
+		return 0, fmt.Errorf("epsilon must be between 0 and 1, inclusive")
+	}
+	if u >= epsilon {
+		return 1, nil
+	}
+	return float32((1 + math.Tanh(float64(phi*(u-epsilon))))), nil
 }
 
 // Apply Difference of Gaussians as preprocessor for edge detection
-func DoG(img image.Image, opts DoGOptions) *image.Gray {
+func DoG(img image.Image, opts DoGOptions) (*image.Gray, error) {
+	err := validateDoGOptions(opts)
+	if err != nil {
+		return nil, err
+	}
+
 	fmt.Println("Applying Difference of Gaussians")
 	b1 := gift.New(gift.GaussianBlur(opts.Sigma1))
 	b2 := gift.New(gift.GaussianBlur(opts.Sigma2))
@@ -61,11 +77,14 @@ func DoG(img image.Image, opts DoGOptions) *image.Gray {
 			// Winnemoller's XDoG operator: (1 + τ) * G_1 - τ * G_2
 			g1 := float32(p1.Y) / 255
 			g2 := float32(p2.Y) / 255
-			d := tanThreshold((1+opts.Tau)*g1-opts.Tau*g2, opts.Epsilon, opts.Phi)
+			d, err := tanThreshold((1+opts.Tau)*g1-opts.Tau*g2, opts.Epsilon, opts.Phi)
+			if err != nil {
+				return nil, err
+			}
 			doG.Set(j, i, color.Gray{Y: uint8(math.Round(255 * float64(d)))})
 		}
 	}
-	return doG
+	return doG, nil
 }
 
 // Compute angle of X Y gradients and map to discrete edges if magnitude above threshold
@@ -100,7 +119,10 @@ func xyToEdge(x, y, threshold float32) Edge {
 }
 
 // Map an image to a 2d slice of Edge types
-func MapEdges(img *image.Gray, sobelThreshold float32) [][]Edge {
+func MapEdges(img *image.Gray, sobelThreshold float32) ([][]Edge, error) {
+	if sobelThreshold < 0 || sobelThreshold > 1 {
+		return nil, fmt.Errorf("sobel filter threshold must be between 0 and 1, inclusive")
+	}
 	fmt.Println("Mapping edges...")
 	threshold := sobelThreshold * float32(math.Hypot(255*4, 255*4))
 
@@ -141,7 +163,7 @@ func MapEdges(img *image.Gray, sobelThreshold float32) [][]Edge {
 			edges[y][x] = xyToEdge(float32(sumY), float32(sumX), threshold)
 		}
 	}
-	return edges
+	return edges, nil
 }
 
 func DownscaleEdges(edges [][]Edge, newWidth int, hWeight, threshold float32) ([][]rune, error) {

@@ -10,7 +10,13 @@ import (
 )
 
 // Grayscale and Downscale
-func GrayDownscale(img image.Image, width int, squash float32) *image.Gray {
+func GrayDownscale(img image.Image, width int, squash float32) (*image.Gray, error) {
+	if width <= 0 {
+		return nil, fmt.Errorf("width must be positive")
+	}
+	if squash <= 0 {
+		return nil, fmt.Errorf("horizontal scale must be positive")
+	}
 	scale := float64(img.Bounds().Dx()) / float64(width) * float64(squash)
 	height := int(math.Floor(float64(img.Bounds().Dy()) / scale))
 
@@ -18,11 +24,14 @@ func GrayDownscale(img image.Image, width int, squash float32) *image.Gray {
 	dst := image.NewGray(g.Bounds(img.Bounds()))
 	g.Draw(dst, img)
 
-	return dst
+	return dst, nil
 }
 
 // Converts a grayscale image to ASCII art
-func ConvertToASCIIArt(img image.Image, charset []rune) [][]rune {
+func ConvertToASCIIArt(img image.Image, charset []rune) ([][]rune, error) {
+	if len(charset) == 0 {
+		return nil, fmt.Errorf("charset must not be empty")
+	}
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
 
@@ -38,7 +47,7 @@ func ConvertToASCIIArt(img image.Image, charset []rune) [][]rune {
 		asciiArt[y] = row
 	}
 
-	return asciiArt
+	return asciiArt, nil
 }
 
 // Prints the 2D ASCII art to the console

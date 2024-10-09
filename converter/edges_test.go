@@ -47,7 +47,10 @@ func TestDoG(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		doG := DoG(img, d.opt)
+		doG, err := DoG(img, d.opt)
+		if err != nil {
+			t.Fatalf("Failed to perform Difference of Gaussians: %v\n", err)
+		}
 
 		outputPath := filepath.Join("..", "testdata", "output", "TestDoG"+strconv.Itoa(i)+".png")
 		outFile, err := os.Create(outputPath)
@@ -107,7 +110,10 @@ func TestMapEdges(t *testing.T) {
 		t.Fatalf("Failed to decode image: %v", err)
 	}
 
-	edges := MapEdges(img.(*image.Gray), 0.1)
+	edges, err := MapEdges(img.(*image.Gray), 0.1)
+	if err != nil {
+		t.Fatalf("Failed to map edges: %v\n", err)
+	}
 
 	for _, row := range edges {
 		t.Log(row)
@@ -166,10 +172,17 @@ func TestEdgesIntegration(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		doG := DoG(img, d.dOpts)
-		edges := MapEdges(doG, d.sThreshold)
-		edgesDS, _ := DownscaleEdges(edges, d.newWidth, 2.3, d.eThreshold)
+		doG, err := DoG(img, d.dOpts)
+		if err != nil {
+			t.Fatalf("Failed to perform Difference of Gaussians: %v\n", err)
+		}
 
+		edges, err := MapEdges(doG, d.sThreshold)
+		if err != nil {
+			t.Fatalf("Failed to map edges: %v\n", err)
+		}
+
+		edgesDS, _ := DownscaleEdges(edges, d.newWidth, 2.3, d.eThreshold)
 		for _, row := range edgesDS {
 			t.Log(string(row))
 		}

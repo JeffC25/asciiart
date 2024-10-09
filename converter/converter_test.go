@@ -27,10 +27,31 @@ func TestConverter(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		t.Log("Converting...")
-
 		c := NewConverter(img)
+		t.Log("Converting to ascii with base and edges...")
 		a, err := c.Convert()
+		if err != nil {
+			t.Errorf("Error converting image: %v", err)
+		}
+
+		for _, row := range a {
+			t.Log(string(row))
+		}
+
+		c.IncEdges = No
+		t.Log("Converting to ascii without edges...")
+		a, err = c.Convert()
+		if err != nil {
+			t.Errorf("Error converting image: %v", err)
+		}
+
+		for _, row := range a {
+			t.Log(string(row))
+		}
+
+		c.IncEdges = Only
+		t.Log("Converting to ascii with edges only...")
+		a, err = c.Convert()
 		if err != nil {
 			t.Errorf("Error converting image: %v", err)
 		}

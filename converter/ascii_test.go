@@ -36,28 +36,31 @@ func TestGrayDownscale(t *testing.T) {
 
 		file, err := os.Open(d.filePath)
 		if err != nil {
-			t.Fatalf("Failed to open file: %v", err)
+			t.Fatalf("Failed to open file: %v\n", err)
 		}
 		defer file.Close()
 
 		img, _, err := image.Decode(file)
 		if err != nil {
-			t.Fatalf("Failed to decode image: %v", err)
+			t.Fatalf("Failed to decode image: %v\n", err)
 		}
 
-		pre := GrayDownscale(img, d.width, 1)
+		pre, err := GrayDownscale(img, d.width, 1)
+		if err != nil {
+			t.Fatalf("Failed to grayscale and downscale: %v\n", err)
+		}
 
 		outputPath := filepath.Join("..", "testdata", "output", "TestGrayDownscale"+strconv.Itoa(i)+".png")
 		outFile, err := os.Create(outputPath)
 		if err != nil {
-			t.Fatalf("Failed to create TestGrayDownscale%d.png: %v \n", i, err)
+			t.Fatalf("Failed to create TestGrayDownscale%d.png: %v\n", i, err)
 		}
 
 		defer outFile.Close()
 
 		err = png.Encode(outFile, pre)
 		if err != nil {
-			t.Fatalf("Failed to save image: %v", err)
+			t.Fatalf("Failed to save image: %v\n", err)
 		}
 
 		t.Logf("Image saved as TestGrayDownscale%d.png", i)
@@ -100,7 +103,10 @@ func TestConvertToASCIIArt(t *testing.T) {
 			t.Fatalf("Failed to decode image: %v", err)
 		}
 
-		a := ConvertToASCIIArt(img, d.charset)
+		a, err := ConvertToASCIIArt(img, d.charset)
+		if err != nil {
+			t.Fatalf("Failed to convert to ascii: %v\n", err)
+		}
 
 		outputPath := filepath.Join("..", "testdata", "output", "ASCIIArt"+strconv.Itoa(i)+".txt")
 		outFile, err := os.Create(outputPath)
