@@ -1,7 +1,10 @@
 # ASCII Art Converter
 🚧 Heads up! This project is still in development - expect breaking changes along the way. 🚧
 
+![image](https://github.com/user-attachments/assets/9e4183e3-b970-4346-8563-5a87e825779c)
+
 ## Overview
+
 This tool converts png/jpeg images into ASCII art while detecting edges and their angles within an image to map them to special characters.
 
 Written in pure Go with no external dependencies.
