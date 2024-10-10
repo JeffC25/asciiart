@@ -9,7 +9,7 @@ This tool converts png/jpeg images into ASCII art while detecting edges and thei
 
 Written in pure Go with no external dependencies.
 
-## Example
+## Pipeline
 
 <details>
 <summary>1. Original image </summary>
