@@ -21,7 +21,7 @@ Written in pure Go with no external dependencies.
 <img src="https://github.com/user-attachments/assets/a2cdcbe6-f434-467b-bebb-547b74deceda"/>
 </details>
 
-<details><summary>3. Detect edges from the XDoG Output via Sobel filter and calculate angle based on X/Y gradient magnitudes </summary>
+<details><summary>3. Detect edges from the XDoG Output via Sobel filter and calculate angles based on X/Y gradient magnitudes </summary>
   
   ```text
                                                                                                 |       //             |      
