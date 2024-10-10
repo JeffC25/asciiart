@@ -7,7 +7,7 @@
 
 This tool converts png/jpeg images into ASCII art while detecting edges and their angles within an image to map them to special characters.
 
-Written in pure Go with no installed external dependencies required.
+Written in pure Go - no installation of external dependencies required.
 
 ## Pipeline
 
