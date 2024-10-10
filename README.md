@@ -21,7 +21,7 @@ Written in pure Go with no external dependencies.
 <img src="https://github.com/user-attachments/assets/a2cdcbe6-f434-467b-bebb-547b74deceda"/>
 </details>
 
-<details><summary>3. Edges on XDoG Output via Sobel filter</summary>
+<details><summary>3. Detect and map on XDoG Output via Sobel filter</summary>
   
   ```text
                                                                                                 |       //             |      
