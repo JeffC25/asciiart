@@ -12,16 +12,16 @@ Written in pure Go with no external dependencies.
 ## Example
 
 <details>
-<summary>1. Input image</summary>
+<summary>1. Original image </summary>
 <img src="https://github.com/user-attachments/assets/c8af42ce-e296-4625-bf1c-ff6551ee5572" />
 </details>
 
 <details>
-<summary>2. Preprocess image with Extended Difference of Gaussians </summary>
+<summary>2. Preprocess the image with an Extended Difference of Gaussians filter </summary>
 <img src="https://github.com/user-attachments/assets/a2cdcbe6-f434-467b-bebb-547b74deceda"/>
 </details>
 
-<details><summary>3. Detect and map on XDoG Output via Sobel filter</summary>
+<details><summary>3. Detect edges from the XDoG Output via Sobel filter and calculate angle based on X/Y gradient magnitudes </summary>
   
   ```text
                                                                                                 |       //             |      
@@ -68,7 +68,7 @@ Written in pure Go with no external dependencies.
 </details>
 
 
-<details> <summary>4. Map original image to ASCII characters</summary>
+<details> <summary>4. Map the original image to ASCII characters based on luminence </summary>
 
 ```text
  ..............           .............                                           .......::::::***++%%%+*:::::::::::::***++++%
@@ -114,7 +114,7 @@ Written in pure Go with no external dependencies.
 ```
 </details>
 
-<details><summary>5. Overlay edges on base ASCII mapping</summary>
+<details><summary>5. Overlay the edges on the base ASCII mapping </summary>
 
 ```text
  ..............           .............                                           .......::::::*|*++%%%+//::::::::::::*|*++++%
