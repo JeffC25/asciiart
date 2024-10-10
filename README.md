@@ -18,7 +18,7 @@ Written in pure Go with no external dependencies.
 <img src="https://github.com/user-attachments/assets/a2cdcbe6-f434-467b-bebb-547b74deceda"/>
 </details>
 
-<details><summary>3. Sobel Filter to detect edges on XDoG Output</summary>
+<details><summary>3. Edges on XDoG Output via Sobel filter</summary>
   
   ```text
                                                                                                 |       //             |      
@@ -111,7 +111,7 @@ Written in pure Go with no external dependencies.
 ```
 </details>
 
-<details><summary>5. Edges overlayed on base ASCII mapping</summary>
+<details><summary>5. Overlay edges on base ASCII mapping</summary>
 
 ```text
  ..............           .............                                           .......::::::*|*++%%%+//::::::::::::*|*++++%
