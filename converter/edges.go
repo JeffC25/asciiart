@@ -268,7 +268,6 @@ func OverlayEdges(base, edges [][]rune) ([][]rune, error) {
 	for y := 0; y < height; y++ {
 		dst[y] = make([]rune, width)
 		for x := 0; x < width; x++ {
-			fmt.Printf("y: %d, x: %d\n", y, x)
 			if edges[y][x] == ' ' {
 				dst[y][x] = base[y][x]
 			} else {
