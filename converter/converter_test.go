@@ -38,7 +38,7 @@ func TestConverter(t *testing.T) {
 			t.Log(string(row))
 		}
 
-		c.IncEdges = No
+		c.DoEdges = false
 		t.Log("Converting to ascii without edges...")
 		a, err = c.Convert()
 		if err != nil {
@@ -49,7 +49,8 @@ func TestConverter(t *testing.T) {
 			t.Log(string(row))
 		}
 
-		c.IncEdges = Only
+		c.DoBase = false
+		c.DoEdges = true
 		t.Log("Converting to ascii with edges only...")
 		a, err = c.Convert()
 		if err != nil {

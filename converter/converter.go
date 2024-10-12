@@ -5,35 +5,31 @@ import (
 	"image"
 )
 
-type ynoOpt int8
-
-const (
-	Yes ynoOpt = iota
-	No
-	Only
-)
-
 type Converter struct {
 	Img        image.Image
-	Charset    []rune
-	Width      int
+	CharSet    []rune
+	CharWidth  int
 	DOpts      DoGOptions
 	SThreshold float32
 	EThreshold float32
 	HWeight    float32
-	IncEdges   ynoOpt
+	DoEdges    bool
+	DoBase     bool
+	DoDoG      bool
 }
 
 func NewConverter(img image.Image, options ...func(*Converter)) *Converter {
 	c := &Converter{
 		Img:        img,
-		Width:      175,
-		Charset:    []rune(" .:-=+*#%@"),
+		CharWidth:  175,
+		CharSet:    []rune(" .:-=+*#%@"),
 		DOpts:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 		SThreshold: 0.15,
 		EThreshold: 0.05,
 		HWeight:    2.3,
-		IncEdges:   Yes,
+		DoEdges:    true,
+		DoBase:     true,
+		DoDoG:      true,
 	}
 
 	for _, opt := range options {
@@ -45,13 +41,13 @@ func NewConverter(img image.Image, options ...func(*Converter)) *Converter {
 
 func WithWidth(width int) func(*Converter) {
 	return func(c *Converter) {
-		c.Width = width
+		c.CharWidth = width
 	}
 }
 
 func WithCharset(charset []rune) func(*Converter) {
 	return func(c *Converter) {
-		c.Charset = charset
+		c.CharSet = charset
 	}
 }
 
@@ -93,7 +89,7 @@ func WithSThreshold(threshold float32) func(*Converter) {
 
 func WithEThreshold(threshold float32) func(*Converter) {
 	return func(c *Converter) {
-		c.SThreshold = threshold
+		c.EThreshold = threshold
 	}
 }
 
@@ -103,33 +99,61 @@ func WithhWeight(hWeight float32) func(*Converter) {
 	}
 }
 
-func WithEdges(yno ynoOpt) func(*Converter) {
+func WithDoEdges(doEdges bool) func(*Converter) {
 	return func(c *Converter) {
-		c.IncEdges = yno
+		c.DoEdges = doEdges
+	}
+}
+
+func WithDoBase(doBase bool) func(*Converter) {
+	return func(c *Converter) {
+		c.DoBase = doBase
+	}
+}
+
+func WithDoDoG(doDoG bool) func(*Converter) {
+	return func(c *Converter) {
+		c.DoDoG = doDoG
 	}
 }
 
 func (c *Converter) Convert() ([][]rune, error) {
+	if !c.DoEdges && !c.DoBase {
+		return nil, fmt.Errorf("can not convert with both edges and base ascii disabled")
+	}
+
 	var a [][]rune
-	if c.IncEdges != Only {
+	if c.DoBase {
 		fmt.Println("Mapping luminance to ascii...")
-		g, err := (GrayDownscale(c.Img, c.Width, c.HWeight))
+		g, err := GrayDownscale(c.Img, c.CharWidth, c.HWeight)
 		if err != nil {
 			return nil, err
 		}
 
-		a, err = ConvertToASCIIArt(g, c.Charset)
+		a, err = ConvertToASCIIArt(g, c.CharSet)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	var e [][]rune
-	if c.IncEdges != No {
+	if c.DoEdges {
 		fmt.Println("Mapping edges to ascii...")
-		d, err := DoG(c.Img, c.DOpts)
-		if err != nil {
-			return nil, err
+
+		var d *image.Gray
+		if c.DoDoG {
+			var err error
+			d, err = DoG(c.Img, c.DOpts)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			d = image.NewGray(c.Img.Bounds())
+			for y := 0; y < c.Img.Bounds().Dy(); y++ {
+				for x := 0; x < c.Img.Bounds().Dx(); x++ {
+					d.Set(x, y, c.Img.At(x, y))
+				}
+			}
 		}
 
 		m, err := MapEdges(d, c.SThreshold)
@@ -138,23 +162,22 @@ func (c *Converter) Convert() ([][]rune, error) {
 
 		}
 
-		e, err = DownscaleEdges(m, c.Width, c.HWeight, c.EThreshold)
+		e, err = DownscaleEdges(m, c.CharWidth, c.HWeight, c.EThreshold)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	switch c.IncEdges {
-	case Only:
-		return e, nil
-	case Yes:
+	switch {
+	case c.DoEdges && c.DoBase:
 		dst, err := OverlayEdges(a, e)
 		if err != nil {
 			return nil, err
-
 		}
 		return dst, nil
-	default: // no edges
+	case c.DoEdges:
+		return e, nil
+	default:
 		return a, nil
 	}
 
