@@ -17,11 +17,11 @@ Written in pure Go - no installation of external dependencies required.
 </details>
 
 <details>
-<summary>2. Preprocess the image with an Extended Difference of Gaussians filter </summary>
+<summary>2. Preprocess the image with an <a href="https://users.cs.northwestern.edu/~sco590/winnemoeller-cag2012.pdf">Extended Difference of Gaussians filter</a> to accenuate boundaries</summary>
 <img src="https://github.com/user-attachments/assets/a2cdcbe6-f434-467b-bebb-547b74deceda"/>
 </details>
 
-<details><summary>3. Detect edges from the XDoG Output via Sobel filter and calculate angles based on X/Y gradient magnitudes </summary>
+<details><summary>3. Detect edges from the XDoG Output via a <a href="https://en.wikipedia.org/wiki/Sobel_operator">Sobel filter</a> and calculate angles based on X/Y gradient magnitudes </summary>
   
   ```text
                                                                                                 |       //             |      
@@ -114,7 +114,7 @@ Written in pure Go - no installation of external dependencies required.
 ```
 </details>
 
-<details><summary>5. Overlay the edges on the base ASCII mapping </summary>
+<details><summary>5. Overlay the edges onto the base ASCII mapping </summary>
 
 ```text
  ..............           .............                                           .......::::::*|*++%%%+//::::::::::::*|*++++%
