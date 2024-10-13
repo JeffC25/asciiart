@@ -3,19 +3,20 @@ package asciiart
 import (
 	"fmt"
 	"image"
+	"log"
 )
 
 type Converter struct {
-	Img        image.Image
-	CharSet    []rune
-	CharWidth  int
-	DOpts      DoGOptions
-	SThreshold float32
-	EThreshold float32
-	HWeight    float32
-	DoEdges    bool
-	DoBase     bool
-	DoDoG      bool
+	Img        image.Image // image to convert
+	CharSet    []rune      // ascii characters to map image to
+	CharWidth  int         // width of ascii character conversion
+	DOpts      DoGOptions  // options for Difference of Gaussians preprocessing for edge detection
+	SThreshold float32     // minimum threshold (0 to 1) for sobel filter to recognize gradient as edge
+	EThreshold float32     // minimum edge density (0 to 1) in a downscaled block for it to be considered an edge
+	Squash     float32     // factor to compress output height to offset aspect ratio differences between ascii and pixels
+	DoEdges    bool        // whether to apply edge detection
+	DoBase     bool        // whether to apply base ascii luminance mapping
+	DoDoG      bool        // whether to apply Difference of Gaussians preprocessing for edge detection
 }
 
 func NewConverter(img image.Image, options ...func(*Converter)) *Converter {
@@ -26,7 +27,7 @@ func NewConverter(img image.Image, options ...func(*Converter)) *Converter {
 		DOpts:      DoGOptions{Sigma1: 4, Sigma2: 10, Epsilon: 0.65, Tau: 0.8, Phi: 25},
 		SThreshold: 0.15,
 		EThreshold: 0.05,
-		HWeight:    2.3,
+		Squash:     2.3,
 		DoEdges:    true,
 		DoBase:     true,
 		DoDoG:      true,
@@ -93,9 +94,9 @@ func WithEThreshold(threshold float32) func(*Converter) {
 	}
 }
 
-func WithhWeight(hWeight float32) func(*Converter) {
+func WithSquash(squash float32) func(*Converter) {
 	return func(c *Converter) {
-		c.HWeight = hWeight
+		c.Squash = squash
 	}
 }
 
@@ -119,13 +120,13 @@ func WithDoDoG(doDoG bool) func(*Converter) {
 
 func (c *Converter) Convert() ([][]rune, error) {
 	if !c.DoEdges && !c.DoBase {
-		return nil, fmt.Errorf("can not convert with both edges and base ascii disabled")
+		return nil, fmt.Errorf("both edge detection and base ASCII generation are disabled; please enable at least one option")
 	}
 
 	var a [][]rune
 	if c.DoBase {
-		fmt.Println("Mapping luminance to ascii...")
-		g, err := GrayDownscale(c.Img, c.CharWidth, c.HWeight)
+		log.Println("Mapping luminance to ascii...")
+		g, err := GrayDownscale(c.Img, c.CharWidth, c.Squash)
 		if err != nil {
 			return nil, err
 		}
@@ -138,7 +139,7 @@ func (c *Converter) Convert() ([][]rune, error) {
 
 	var e [][]rune
 	if c.DoEdges {
-		fmt.Println("Mapping edges to ascii...")
+		log.Println("Mapping edges to ascii...")
 
 		var d *image.Gray
 		if c.DoDoG {
@@ -162,7 +163,7 @@ func (c *Converter) Convert() ([][]rune, error) {
 
 		}
 
-		e, err = DownscaleEdges(m, c.CharWidth, c.HWeight, c.EThreshold)
+		e, err = DownscaleEdges(m, c.CharWidth, c.Squash, c.EThreshold)
 		if err != nil {
 			return nil, err
 		}

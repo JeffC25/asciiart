@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"image/color"
+	"log"
 	"math"
 
 	"github.com/disintegration/gift"
@@ -21,11 +22,11 @@ const (
 )
 
 type DoGOptions struct {
-	Sigma1  float32 // 1st Gaussian blur
-	Sigma2  float32 // 2nd Gaussian blur
-	Epsilon float32 // Magnitude threshold
-	Tau     float32 // Gaussian scalar coefficient
-	Phi     float32 // Hyperbolic tangent param
+	Sigma1  float32 // Standard deviation of the first Gaussian blur
+	Sigma2  float32 // Standard deviation of the second Gaussian blur
+	Epsilon float32 // Threshold (0, 1) for Gaussian difference to be considered fully bright
+	Tau     float32 // Emphasis of larger-scale structures
+	Phi     float32 // Sharpness of edge transitions
 }
 
 func validateDoGOptions(opts DoGOptions) error {
@@ -54,7 +55,7 @@ func DoG(img image.Image, opts DoGOptions) (*image.Gray, error) {
 		return nil, err
 	}
 
-	fmt.Println("Applying Difference of Gaussians")
+	log.Println("Applying Difference of Gaussians")
 	b1 := gift.New(gift.GaussianBlur(opts.Sigma1))
 	b2 := gift.New(gift.GaussianBlur(opts.Sigma2))
 
@@ -123,7 +124,7 @@ func MapEdges(img *image.Gray, sobelThreshold float32) ([][]Edge, error) {
 	if sobelThreshold < 0 || sobelThreshold > 1 {
 		return nil, fmt.Errorf("sobel filter threshold must be between 0 and 1, inclusive")
 	}
-	fmt.Println("Mapping edges...")
+	log.Println("Mapping edges...")
 	threshold := sobelThreshold * float32(math.Hypot(255*4, 255*4))
 
 	Gx := [3][3]int{
@@ -179,7 +180,7 @@ func DownscaleEdges(edges [][]Edge, newWidth int, hWeight, threshold float32) ([
 		return nil, fmt.Errorf("threshold needs to be between 0 and 1: %2f", threshold)
 	}
 
-	fmt.Println("Downscaling edges...")
+	log.Println("Downscaling edges...")
 	height := len(edges)
 	width := len(edges[0])
 
@@ -202,10 +203,10 @@ func DownscaleEdges(edges [][]Edge, newWidth int, hWeight, threshold float32) ([
 				j := int(math.Floor(float64(x)*xScale)) + subX
 
 				if i >= len(edges) {
-					return None, fmt.Errorf("Y out of range: %d from %d", i, len(edges))
+					return None, fmt.Errorf("y out of range: %d from %d", i, len(edges))
 				}
 				if j >= len(edges[0]) {
-					return None, fmt.Errorf("X out of range: %d from %d", j, len(edges[0]))
+					return None, fmt.Errorf("x out of range: %d from %d", j, len(edges[0]))
 				}
 
 				edge := edges[i][j]
@@ -254,7 +255,7 @@ func DownscaleEdges(edges [][]Edge, newWidth int, hWeight, threshold float32) ([
 }
 
 func OverlayEdges(base, edges [][]rune) ([][]rune, error) {
-	fmt.Println("Overlaying edges...")
+	log.Println("Overlaying edges...")
 	width := len(base[0])
 	height := len(base)
 
