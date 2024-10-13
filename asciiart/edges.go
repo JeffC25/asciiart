@@ -55,7 +55,7 @@ func DoG(img image.Image, opts DoGOptions) (*image.Gray, error) {
 		return nil, err
 	}
 
-	log.Println("Applying Difference of Gaussians")
+	log.Println("Applying Difference of Gaussians preprocessing...")
 	b1 := gift.New(gift.GaussianBlur(opts.Sigma1))
 	b2 := gift.New(gift.GaussianBlur(opts.Sigma2))
 
