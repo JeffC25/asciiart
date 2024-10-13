@@ -263,8 +263,6 @@ func OverlayEdges(base, edges [][]rune) ([][]rune, error) {
 		return nil, fmt.Errorf("mismatched dimensions: %d x %d and %d x %d", width, height, len(edges), len(edges[0]))
 	}
 
-	fmt.Printf("%d x %d\n", width, height)
-
 	dst := make([][]rune, height)
 	for y := 0; y < height; y++ {
 		dst[y] = make([]rune, width)
