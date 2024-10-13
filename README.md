@@ -160,7 +160,17 @@ Written in pure Go using standard libraries and the `disintegration/gift` module
 </details>
 
 ## Install
-🚧 WIP 🚧
+To install as CLI:
+
+```sh
+go install github.com/jeffc25/asciiart@latest
+```
+
+
+To install as a dependency into your Go project:
+```sh
+go get github.com/jeffc25/asciiart
+```
 
 ## Usage
 🚧 WIP 🚧
