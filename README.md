@@ -4,10 +4,9 @@
 ![image](https://github.com/user-attachments/assets/9e4183e3-b970-4346-8563-5a87e825779c)
 
 ## Overview
+Tool to generate ASCII art from images with edge and angle detection.
 
-This tool converts png/jpeg images into ASCII art while detecting edges and their angles within an image to map them to special characters.
-
-Written in pure Go - no installation of external dependencies required.
+Written in pure Go using standard libraries and the `disintegration/gift` module.
 
 ## Pipeline
 
