@@ -13,10 +13,10 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		log.Fatal("Usage: asciiart <file> [options]")
+		log.Fatal("Usage: asciiart [options] <file>")
 	}
 
-	file, err := os.Open(os.Args[1])
+	file, err := os.Open(os.Args[len(os.Args)-1])
 	if err != nil {
 		log.Fatalf("Failed to open file: %v\n", err)
 	}
