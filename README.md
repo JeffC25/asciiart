@@ -167,7 +167,7 @@ go install github.com/jeffc25/asciiart@latest
 ```
 
 
-To install as a dependency into your Go project:
+To install as project dependency:
 ```sh
 go get github.com/jeffc25/asciiart
 ```
