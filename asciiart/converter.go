@@ -149,12 +149,7 @@ func (c *Converter) Convert() ([][]rune, error) {
 				return nil, err
 			}
 		} else {
-			d = image.NewGray(c.Img.Bounds())
-			for y := 0; y < c.Img.Bounds().Dy(); y++ {
-				for x := 0; x < c.Img.Bounds().Dx(); x++ {
-					d.Set(x, y, c.Img.At(x, y))
-				}
-			}
+			d = Grayscale(c.Img)
 		}
 
 		m, err := MapEdges(d, c.SThreshold)
