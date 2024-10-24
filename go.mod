@@ -1,4 +1,4 @@
-module github.com/jeffc25/ascii-art
+module github.com/jeffc25/asciiart
 
 go 1.23.1
 

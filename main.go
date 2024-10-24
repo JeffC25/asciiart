@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/jeffc25/ascii-art/asciiart"
+	"github.com/jeffc25/asciiart/asciiart"
 )
 
 func main() {
