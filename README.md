@@ -3,12 +3,12 @@
 
 ![image](https://github.com/user-attachments/assets/9e4183e3-b970-4346-8563-5a87e825779c)
 
-## Overview
+### Overview
 Tool to generate ASCII art from images with edge and angle detection.
 
 Written in pure Go using standard libraries and the `disintegration/gift` module.
 
-## Pipeline
+### Pipeline
 
 <details>
 <summary>1. Original image </summary>
@@ -159,7 +159,7 @@ Written in pure Go using standard libraries and the `disintegration/gift` module
 ```
 </details>
 
-## Install
+### Installation
 To install as CLI:
 
 ```sh
@@ -172,5 +172,5 @@ To install as project dependency:
 go get github.com/jeffc25/asciiart
 ```
 
-## Usage
+### Usage
 🚧 WIP 🚧
