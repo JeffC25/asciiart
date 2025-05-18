@@ -58,8 +58,8 @@ func DoG(img image.Image, opts DoGOptions) (*image.Gray, error) {
 	height := img.Bounds().Dy()
 
 	doG := image.NewGray(img.Bounds())
-	for i := 0; i < height; i++ {
-		for j := 0; j < width; j++ {
+	for i := range height {
+		for j := range width {
 
 			p1 := dst1.GrayAt(j, i)
 			p2 := dst2.GrayAt(j, i)

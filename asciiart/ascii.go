@@ -36,9 +36,9 @@ func ConvertToASCIIArt(img image.Image, charset []rune) ([][]rune, error) {
 	width, height := bounds.Max.X, bounds.Max.Y
 
 	asciiArt := make([][]rune, height)
-	for y := 0; y < height; y++ {
+	for y := range height {
 		row := make([]rune, width)
-		for x := 0; x < width; x++ {
+		for x := range width {
 			grayColor := color.GrayModel.Convert(img.At(x, y)).(color.Gray)
 			luminance := grayColor.Y
 			index := int(luminance) * (len(charset) - 1) / 255

@@ -72,7 +72,7 @@ func MapEdges(img *image.Gray, sobelThreshold float32) ([][]Edge, error) {
 	height := img.Bounds().Dy()
 
 	edges := make([][]Edge, height)
-	for y := 0; y < height; y++ {
+	for y := range height {
 		edges[y] = make([]Edge, width)
 	}
 
@@ -119,7 +119,7 @@ func DownscaleEdges(edges [][]Edge, newWidth int, hWeight, threshold float32) ([
 	newHeight := int(math.Floor(float64(height) / yScale))
 
 	dst := make([][]rune, newHeight)
-	for y := 0; y < newHeight; y++ {
+	for y := range newHeight {
 		dst[y] = make([]rune, newWidth)
 	}
 
@@ -160,8 +160,8 @@ func DownscaleEdges(edges [][]Edge, newWidth int, hWeight, threshold float32) ([
 		return None, nil
 	}
 
-	for y := 0; y < newHeight; y++ {
-		for x := 0; x < newWidth; x++ {
+	for y := range newHeight {
+		for x := range newWidth {
 			e, err := getSubmatrixEdge(x, y)
 			if err != nil {
 				return nil, err
@@ -194,9 +194,9 @@ func OverlayEdges(base, edges [][]rune) ([][]rune, error) {
 	}
 
 	dst := make([][]rune, height)
-	for y := 0; y < height; y++ {
+	for y := range height {
 		dst[y] = make([]rune, width)
-		for x := 0; x < width; x++ {
+		for x := range width {
 			if edges[y][x] == ' ' {
 				dst[y][x] = base[y][x]
 			} else {
