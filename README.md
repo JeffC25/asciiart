@@ -1,13 +1,13 @@
 # ASCII Art Converter
 
 ### Overview
-Tool to generate ASCII art from images with edge and angle detection.
+A tool that converts images into ASCII art through edge detection and orientation analysis, assigning ASCII characters based on the local angle of each detected edge.
 
 Written in pure Go using standard libraries and the `disintegration/gift` module.
 
 ![image](https://github.com/user-attachments/assets/9e4183e3-b970-4346-8563-5a87e825779c)
 
-### Pipeline
+### Pipeline / How it Works
 
 <details>
 <summary>1. Original image </summary>
@@ -15,7 +15,7 @@ Written in pure Go using standard libraries and the `disintegration/gift` module
 </details>
 
 <details>
-<summary>2. Preprocess the image with an <a href="https://users.cs.northwestern.edu/~sco590/winnemoeller-cag2012.pdf">Extended Difference of Gaussians filter</a> to accenuate boundaries</summary>
+<summary>2. Preprocess the image with an <a href="https://users.cs.northwestern.edu/~sco590/winnemoeller-cag2012.pdf">Extended Difference of Gaussians (XDog) filter</a> to accenuate boundaries</summary>
 <img src="https://github.com/user-attachments/assets/a2cdcbe6-f434-467b-bebb-547b74deceda"/>
 </details>
 
@@ -164,7 +164,6 @@ To install as CLI:
 ```sh
 go install github.com/jeffc25/asciiart@latest
 ```
-
 
 To install as project dependency:
 ```sh
