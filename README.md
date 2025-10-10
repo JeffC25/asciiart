@@ -19,7 +19,7 @@ Written in pure Go using standard libraries and the `disintegration/gift` module
 <img src="https://github.com/user-attachments/assets/a2cdcbe6-f434-467b-bebb-547b74deceda"/>
 </details>
 
-<details><summary>3. Detect edges from the XDoG Output via a <a href="https://en.wikipedia.org/wiki/Sobel_operator">Sobel filter</a> and calculate angles based on X/Y gradient magnitudes </summary>
+<details><summary>3. Detect edges from the XDoG output via a <a href="https://en.wikipedia.org/wiki/Sobel_operator">Sobel filter</a> and calculate angles based on X/Y gradient magnitudes </summary>
   
   ```text
                                                                                                 |       //             |      
