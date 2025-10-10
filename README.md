@@ -1,12 +1,11 @@
 # ASCII Art Converter
-🚧 Heads up! This project is still in development - expect breaking changes along the way. 🚧
-
-![image](https://github.com/user-attachments/assets/9e4183e3-b970-4346-8563-5a87e825779c)
 
 ### Overview
 Tool to generate ASCII art from images with edge and angle detection.
 
 Written in pure Go using standard libraries and the `disintegration/gift` module.
+
+![image](https://github.com/user-attachments/assets/9e4183e3-b970-4346-8563-5a87e825779c)
 
 ### Pipeline
 
