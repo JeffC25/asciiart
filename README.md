@@ -3,7 +3,7 @@
 ### Overview
 A tool that converts images into ASCII art through edge detection and orientation analysis, assigning ASCII characters based on the local angle of each detected edge.
 
-Written in pure Go using standard libraries and the `disintegration/gift` module.
+Written in pure Go using the `disintegration/gift` module and standard libraries.
 
 ![image](https://github.com/user-attachments/assets/9e4183e3-b970-4346-8563-5a87e825779c)
 
@@ -171,4 +171,63 @@ go get github.com/jeffc25/asciiart
 ```
 
 ### Usage
-🚧 WIP 🚧
+
+#### CLI
+
+```sh
+asciiart [options] <file>
+```
+
+The input file's format is inferred from its contents (JPEG and PNG are supported). Output is printed to stdout.
+
+```sh
+asciiart photo.jpg > art.txt
+```
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `-charset` | `" .:-=+*#%@"` | ASCII characters to map the image to, ordered from darkest to lightest |
+| `-width` | `175` | Width of the ASCII character conversion |
+| `-squash` | `2.3` | Factor to compress output height to offset aspect ratio differences between ASCII characters and pixels |
+| `-s1` | `4` | Sigma for the first Gaussian filter |
+| `-s2` | `10` | Sigma for the second Gaussian filter |
+| `-epsilon` | `0.65` | Epsilon for the Difference of Gaussians (DoG) |
+| `-tau` | `0.8` | Tau for the DoG |
+| `-phi` | `25` | Phi for the DoG |
+| `-sthres` | `0.15` | Minimum threshold for the Sobel filter |
+| `-ethres` | `0.05` | Minimum edge density in a downscaled block |
+| `-nodog` | `false` | Convert without DoG preprocessing for edge detection |
+| `-noedges` | `false` | Convert without edge detection |
+| `-nobase` | `false` | Convert without base ASCII luminance mapping |
+
+#### Library
+
+```go
+package main
+
+import (
+	"image"
+	_ "image/jpeg"
+	"os"
+
+	"github.com/jeffc25/asciiart/asciiart"
+)
+
+func main() {
+	file, _ := os.Open("photo.jpg")
+	defer file.Close()
+	img, _, _ := image.Decode(file)
+
+	c := asciiart.NewConverter(img,
+		asciiart.WithWidth(120),
+		asciiart.WithCharset([]rune(" .:-=+*#%@")),
+	)
+
+	art, err := c.Convert()
+	if err != nil {
+		panic(err)
+	}
+
+	asciiart.PrintASCIIArt(art)
+}
+```
