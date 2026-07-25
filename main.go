@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"image"
 	_ "image/jpeg"
 	_ "image/png"
@@ -12,19 +13,9 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatal("Usage: asciiart [options] <file>")
-	}
-
-	file, err := os.Open(os.Args[len(os.Args)-1])
-	if err != nil {
-		log.Fatalf("Failed to open file: %v\n", err)
-	}
-	defer file.Close()
-
-	img, _, err := image.Decode(file)
-	if err != nil {
-		log.Fatalf("Failed to decode image: %v", err)
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: asciiart [options] <file>\n\nConverts an image to ASCII art.\n\nOptions:\n")
+		flag.PrintDefaults()
 	}
 
 	charset := flag.String("charset", " .:-=+*#%@", "ascii characters to map image to")
@@ -42,6 +33,22 @@ func main() {
 	noDoG := flag.Bool("nodog", false, "convert without Difference of Gaussians preprocessing for edge detection")
 
 	flag.Parse()
+
+	if flag.NArg() != 1 {
+		flag.Usage()
+		os.Exit(2)
+	}
+
+	file, err := os.Open(flag.Arg(0))
+	if err != nil {
+		log.Fatalf("Failed to open file: %v\n", err)
+	}
+	defer file.Close()
+
+	img, _, err := image.Decode(file)
+	if err != nil {
+		log.Fatalf("Failed to decode image: %v", err)
+	}
 
 	c := asciiart.NewConverter(img,
 		asciiart.WithCharset([]rune(*charset)),
