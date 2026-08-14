@@ -41,81 +41,55 @@ func NewConverter(img image.Image, options ...func(*Converter)) *Converter {
 }
 
 func WithWidth(width int) func(*Converter) {
-	return func(c *Converter) {
-		c.CharWidth = width
-	}
+	return func(c *Converter) { c.CharWidth = width }
 }
 
 func WithCharset(charset []rune) func(*Converter) {
-	return func(c *Converter) {
-		c.CharSet = charset
-	}
+	return func(c *Converter) { c.CharSet = charset }
 }
 
 func WithDSigma1(sigma float32) func(*Converter) {
-	return func(c *Converter) {
-		c.DOpts.Sigma1 = sigma
-	}
+	return func(c *Converter) { c.DOpts.Sigma1 = sigma }
 }
 
 func WithDSigma2(sigma float32) func(*Converter) {
-	return func(c *Converter) {
-		c.DOpts.Sigma2 = sigma
-	}
+	return func(c *Converter) { c.DOpts.Sigma2 = sigma }
 }
 
 func WithDEpsilon(epsilon float32) func(*Converter) {
-	return func(c *Converter) {
-		c.DOpts.Epsilon = epsilon
-	}
+	return func(c *Converter) { c.DOpts.Epsilon = epsilon }
 }
 
 func WithDTau(tau float32) func(*Converter) {
-	return func(c *Converter) {
-		c.DOpts.Tau = tau
-	}
+	return func(c *Converter) { c.DOpts.Tau = tau }
 }
 
 func WithDPhi(phi float32) func(*Converter) {
-	return func(c *Converter) {
-		c.DOpts.Phi = phi
-	}
+	return func(c *Converter) { c.DOpts.Phi = phi }
 }
 
 func WithSThreshold(threshold float32) func(*Converter) {
-	return func(c *Converter) {
-		c.SThreshold = threshold
-	}
+	return func(c *Converter) { c.SThreshold = threshold }
 }
 
 func WithEThreshold(threshold float32) func(*Converter) {
-	return func(c *Converter) {
-		c.EThreshold = threshold
-	}
+	return func(c *Converter) { c.EThreshold = threshold }
 }
 
 func WithSquash(squash float32) func(*Converter) {
-	return func(c *Converter) {
-		c.Squash = squash
-	}
+	return func(c *Converter) { c.Squash = squash }
 }
 
 func WithDoEdges(doEdges bool) func(*Converter) {
-	return func(c *Converter) {
-		c.DoEdges = doEdges
-	}
+	return func(c *Converter) { c.DoEdges = doEdges }
 }
 
 func WithDoBase(doBase bool) func(*Converter) {
-	return func(c *Converter) {
-		c.DoBase = doBase
-	}
+	return func(c *Converter) { c.DoBase = doBase }
 }
 
 func WithDoDoG(doDoG bool) func(*Converter) {
-	return func(c *Converter) {
-		c.DoDoG = doDoG
-	}
+	return func(c *Converter) { c.DoDoG = doDoG }
 }
 
 func (c *Converter) Convert() ([][]rune, error) {
@@ -155,7 +129,6 @@ func (c *Converter) Convert() ([][]rune, error) {
 		m, err := MapEdges(d, c.SThreshold)
 		if err != nil {
 			return nil, err
-
 		}
 
 		e, err = DownscaleEdges(m, c.CharWidth, c.Squash, c.EThreshold)
@@ -176,5 +149,4 @@ func (c *Converter) Convert() ([][]rune, error) {
 	default:
 		return a, nil
 	}
-
 }
